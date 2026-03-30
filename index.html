@@ -703,7 +703,8 @@ function renderProgress(){
       let drows='';
       DAYS.filter(d=>d.type===type).forEach(day=>{
         const t=dayTotal(wd,day.id);
-        drows+=`<div class="hw-day-row"><span class="hw-day-name">${day.label}</span><span class="hw-day-val ${type}">${t}</span></div>`;
+        const dayTypeLabel = day.workout === 'max' ? 'Max Days' : day.workout === 'volume' ? 'Sub Max Volume' : 'Ladder Volume';
+        drows+=`<div class="hw-day-row"><span class="hw-day-name">${dayTypeLabel}</span><span class="hw-day-val ${type}">${t}</span></div>`;
       });
       histHtml+=`<div class="history-week"><div class="hw-header" ontouchend="toggleHistWeek(this)"><div><div class="hw-label">${fmtWeek(wk)}</div>${isCur?'<div class="hw-current">CURRENT WEEK</div>':''}</div><div class="hw-total ${type}">${tot} <span style="font-size:.62rem;font-family:'DM Mono';color:var(--muted2)">REPS</span></div></div><div class="hw-body">${drows}</div></div>`;
     });
