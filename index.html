@@ -180,13 +180,13 @@
   .no-data{text-align:center;padding:34px 20px;color:var(--muted2);font-size:0.6rem;letter-spacing:2px;}
 
   /* TIMER */
-  .timer-overlay{display:none;position:fixed;left:0;right:0;bottom:0;height:60px;background:rgba(15,15,15,0.95);z-index:200;align-items:center;justify-content:center;padding:0 12px;box-shadow:0 -2px 12px rgba(0,0,0,.4);pointer-events:none;}
-  .timer-overlay.active{display:flex;}
+  .timer-panel{display:none;margin-top:16px;background:rgba(15,15,15,0.95);border:1px solid var(--border);border-radius:10px;padding:10px 12px;align-items:center;justify-content:space-between;gap:8px;}
+  .timer-panel.active{display:flex;}
   .timer-display{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--text);}
   .timer-display.pull{color:var(--pull);}
   .timer-display.dip{color:var(--dip);}
   .timer-info{font-size:0.63rem;color:var(--muted2);letter-spacing:3px;}
-  .timer-skip{padding:9px 26px;border:1px solid var(--border);background:var(--surface2);color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;margin-top:6px;pointer-events:auto;}
+  .timer-skip{padding:5px 10px;border:1px solid var(--border);background:var(--surface2);color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;}
 </style>
 </head>
 <body>
@@ -235,13 +235,6 @@
 <!-- PROGRESS VIEW -->
 <div id="viewProgress" style="display:none">
   <div class="progress-view" id="progressContent"></div>
-</div>
-
-<!-- TIMER -->
-<div class="timer-overlay" id="timerOverlay">
-  <div class="timer-info" id="timerInfo">REST</div>
-  <div class="timer-display" id="timerDisplay">30</div>
-  <button class="timer-skip" onclick="skipTimer()" ontouchstart="skipTimer()">SKIP</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -320,15 +313,16 @@ function startTimer(workoutType, duration){
   timerSecs = Number.isFinite(duration)?duration:defaultDur;
   const disp=document.getElementById('timerDisplay');
   const info=document.getElementById('timerInfo');
+  const panel=document.getElementById('timerPanel');
   const label = workoutType==='max'?'REST — NEXT SET (5:00)':'volume'===workoutType?'REST — NEXT SET (1:00)':'REST — NEXT RUNG (0:30)';
   info.textContent = label;
   disp.className='timer-display '+(workoutType==='ladder'?'pull':(workoutType==='max'?'dip':workoutType));
   disp.textContent=String(timerSecs).padStart(2,'0');
-  document.getElementById('timerOverlay').classList.add('active');
+  panel.classList.add('active');
   clearInterval(timerInt);
   timerInt=setInterval(()=>{timerSecs--;disp.textContent=String(timerSecs).padStart(2,'0');if(timerSecs<=0)skipTimer();},1000);
 }
-function skipTimer(){clearInterval(timerInt);document.getElementById('timerOverlay').classList.remove('active');}
+function skipTimer(){clearInterval(timerInt);document.getElementById('timerPanel').classList.remove('active');}
 
 // ── DATA HELPERS ──────────────────────────────────────────────────────────────
 function dayState(weekData,dayId){if(!weekData[dayId])weekData[dayId]={};return weekData[dayId];}
@@ -400,6 +394,11 @@ function renderLog(){
       <div class="total-card ${type}"><div class="label">WEEK (${type==='pull'?'PULL':'DIP'})</div><div class="number">${type==='pull'?wt.pull:wt.dip}</div></div>
     </div>
     <div class="sets-container">${setsHtml}</div>
+    <div class="timer-panel" id="timerPanel">
+      <div class="timer-info" id="timerInfo">REST</div>
+      <div class="timer-display" id="timerDisplay">30</div>
+      <button class="timer-skip" onclick="skipTimer()" ontouchstart="skipTimer()">SKIP</button>
+    </div>
     <div class="week-summary">
       <h2>WEEKLY TOTALS</h2>
       <div class="week-grid">
