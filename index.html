@@ -13,6 +13,7 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;}
+  body.timer-active { padding-bottom: 70px; }
 
   /* HEADER */
   header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;}
@@ -323,6 +324,7 @@ function startTimer(workoutType, dayId, setIdx, duration){
   disp.className = 'timer-display ' + (workoutType==='ladder'?'pull':(workoutType==='max'?'dip':'pull'));
   updateGlobalTimerDisplay();
   panel.classList.add('active');
+  document.body.classList.add('timer-active');
   
   clearInterval(timerInt);
   timerInt=setInterval(()=>{timerSecs--;updateGlobalTimerDisplay();if(timerSecs<=0)skipTimer();},1000);
@@ -351,6 +353,7 @@ function skipTimer(){
   clearInterval(timerInt);
   const panel = document.getElementById('timerPanel');
   panel.classList.remove('active');
+  document.body.classList.remove('timer-active');
   if(timerTarget){
     const el=document.getElementById(timerTarget);
     if(el){el.textContent='';el.classList.remove('active');}
