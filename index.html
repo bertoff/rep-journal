@@ -12,7 +12,7 @@
     --text:#f0f0f0; --muted:#444; --muted2:#777;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;padding-bottom:90px;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;}
 
   /* HEADER */
   header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;}
@@ -182,13 +182,13 @@
   .no-data{text-align:center;padding:34px 20px;color:var(--muted2);font-size:0.6rem;letter-spacing:2px;}
 
   /* TIMER */
-  .timer-panel{display:none;margin-top:16px;background:rgba(15,15,15,0.95);border:1px solid var(--border);border-radius:10px;padding:10px 12px;align-items:center;justify-content:space-between;gap:8px;}
+  .timer-panel{display:none;position:fixed;left:0;right:0;bottom:0;height:70px;background:var(--surface);border-top:1px solid var(--border);padding:12px 20px;align-items:center;justify-content:flex-start;gap:16px;z-index:150;}
   .timer-panel.active{display:flex;}
-  .timer-display{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--text);}
+  .timer-info{font-size:0.63rem;color:var(--muted2);letter-spacing:3px;}
+  .timer-display{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--text);min-width:50px;}
   .timer-display.pull{color:var(--pull);}
   .timer-display.dip{color:var(--dip);}
-  .timer-info{font-size:0.63rem;color:var(--muted2);letter-spacing:3px;}
-  .timer-skip{padding:5px 10px;border:1px solid var(--border);background:var(--surface2);color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;}
+  .timer-skip{padding:8px 16px;border:1px solid var(--border);background:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;}
 </style>
 </head>
 <body>
@@ -314,9 +314,25 @@ function startTimer(workoutType, dayId, setIdx, duration){
   const defaultDur = workoutType==='max'?300:workoutType==='volume'?60:workoutType==='ladder'?30:30;
   timerSecs = Number.isFinite(duration)?duration:defaultDur;
   timerTarget = `setTimer_${dayId}_${setIdx}`;
-  updateTimerDisplay();
+  
+  const panel = document.getElementById('timerPanel');
+  const info = document.getElementById('timerInfo');
+  const disp = document.getElementById('timerDisplay');
+  
+  const label = workoutType==='max'?'REST — NEXT SET':'volume'===workoutType?'REST — NEXT SET':'REST — NEXT RUNG';
+  info.textContent = label;
+  disp.className = 'timer-display ' + (workoutType==='ladder'?'pull':(workoutType==='max'?'dip':'pull'));
+  updateGlobalTimerDisplay();
+  panel.classList.add('active');
+  
   clearInterval(timerInt);
-  timerInt=setInterval(()=>{timerSecs--;updateTimerDisplay();if(timerSecs<=0)skipTimer();},1000);
+  timerInt=setInterval(()=>{timerSecs--;updateGlobalTimerDisplay();if(timerSecs<=0)skipTimer();},1000);
+}
+function updateGlobalTimerDisplay(){
+  const disp = document.getElementById('timerDisplay');
+  const mm = String(Math.floor(timerSecs/60)).padStart(2,'0');
+  const ss = String(timerSecs%60).padStart(2,'0');
+  disp.textContent = `${mm}:${ss}`;
 }
 function updateTimerDisplay(){
   if(!timerTarget) return;
@@ -334,6 +350,8 @@ function updateTimerDisplay(){
 }
 function skipTimer(){
   clearInterval(timerInt);
+  const panel = document.getElementById('timerPanel');
+  panel.classList.remove('active');
   if(timerTarget){
     const el=document.getElementById(timerTarget);
     if(el){el.textContent='';el.classList.remove('active');}
@@ -683,5 +701,13 @@ function renderProgress(){
 // ── INIT ──────────────────────────────────────────────────────────────────────
 renderLog();
 </script>
+
+<!-- TIMER BAR -->
+<div class="timer-panel" id="timerPanel">
+  <div class="timer-info" id="timerInfo">REST</div>
+  <div class="timer-display" id="timerDisplay">00:00</div>
+  <button class="timer-skip" onclick="skipTimer()" ontouchstart="skipTimer()">SKIP</button>
+</div>
+
 </body>
 </html>
