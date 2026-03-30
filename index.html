@@ -180,13 +180,13 @@
   .no-data{text-align:center;padding:34px 20px;color:var(--muted2);font-size:0.6rem;letter-spacing:2px;}
 
   /* TIMER */
-  .timer-overlay{display:none;position:fixed;left:0;right:0;bottom:0;height:60px;background:rgba(15,15,15,0.95);z-index:200;align-items:center;justify-content:center;padding:0 12px;box-shadow:0 -2px 12px rgba(0,0,0,.4);}
+  .timer-overlay{display:none;position:fixed;left:0;right:0;bottom:0;height:60px;background:rgba(15,15,15,0.95);z-index:200;align-items:center;justify-content:center;padding:0 12px;box-shadow:0 -2px 12px rgba(0,0,0,.4);pointer-events:none;}
   .timer-overlay.active{display:flex;}
   .timer-display{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--text);}
   .timer-display.pull{color:var(--pull);}
   .timer-display.dip{color:var(--dip);}
   .timer-info{font-size:0.63rem;color:var(--muted2);letter-spacing:3px;}
-  .timer-skip{padding:9px 26px;border:1px solid var(--border);background:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;margin-top:6px;}
+  .timer-skip{padding:9px 26px;border:1px solid var(--border);background:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;margin-top:6px;pointer-events:auto;}
 </style>
 </head>
 <body>
@@ -204,7 +204,7 @@
 
 <div class="nav-bar">
   <button class="nav-btn active" id="navLog"      onclick="switchView('log')" ontouchstart="switchView('log')">LOG</button>
-  <button class="nav-btn"        id="navPast"     onclick="switchView('past')" ontouchstart="switchView('past')">ADD PAST</button>
+  <button class="nav-btn"        id="navPast"     onclick="switchView('past')" ontouchstart="switchView('past')">HISTORY</button>
   <button class="nav-btn"        id="navProgress" onclick="switchView('progress')" ontouchstart="switchView('progress')">PROGRESS</button>
 </div>
 
@@ -214,10 +214,10 @@
   <div class="content"  id="content"></div>
 </div>
 
-<!-- ADD PAST VIEW -->
+<!-- HISTORY VIEW -->
 <div id="viewPast" style="display:none">
   <div class="past-view">
-    <h2>ADD PAST WEEK</h2>
+    <h2>HISTORY</h2>
     <p>Pick any date within the week you want to log. Then select a day and enter your reps.</p>
 
     <div class="week-picker-card">
