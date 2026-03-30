@@ -433,7 +433,7 @@ function renderLog(){
         <div class="week-stat"><div class="label">PULL UPS</div><div class="val pull">${wt.pull}</div></div>
         <div class="week-stat"><div class="label">DIPS</div><div class="val dip">${wt.dip}</div></div>
       </div>
-      <button class="reset-btn" onclick="resetWeek()" ontouchstart="resetWeek()">RESET THIS WEEK</button>
+      <button class="reset-btn" onclick="resetWeek()">RESET THIS WEEK</button>
     </div>`;
   const today=getToday();
   document.getElementById('todayLabel').textContent=today<6?DAYS[today].name:'REST';
