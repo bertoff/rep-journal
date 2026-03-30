@@ -659,9 +659,10 @@ function renderProgress(){
   else{
     [...weeks].reverse().forEach(wk=>{
       const wd=history[wk]||{},wt=weekTotals(wd),tot=type==='pull'?wt.pull:wt.dip,isCur=wk===CURRENT_WEEK;
-      let drows='';
+      let typeSets = {};
       DAYS.filter(d=>d.type===type).forEach(day=>{
         const dayTypeLabel = day.workout === 'max' ? 'Max Days' : day.workout === 'volume' ? 'Sub Max Volume' : 'Ladder Volume';
+        if(!typeSets[dayTypeLabel]) typeSets[dayTypeLabel] = [];
         for(let s=0; s<day.sets; s++){
           let setReps = 0;
           if(day.workout === 'ladder'){
@@ -671,8 +672,14 @@ function renderProgress(){
             setReps = wd[day.id]?.[`set_${s}`] || 0;
           }
           if(setReps > 0){
-            drows+=`<div class="hw-day-row"><span class="hw-day-name">${dayTypeLabel} - Set ${s+1}</span><span class="hw-day-val ${type}">${setReps}</span></div>`;
+            typeSets[dayTypeLabel].push(`Set ${s+1}: ${setReps}`);
           }
+        }
+      });
+      let drows = '';
+      Object.keys(typeSets).forEach(typeLabel => {
+        if(typeSets[typeLabel].length > 0){
+          drows += `<div class="hw-day-row"><span class="hw-day-name">${typeLabel}</span><span class="hw-day-val ${type}">${typeSets[typeLabel].join(', ')}</span></div>`;
         }
       });
       histHtml+=`<div class="history-week"><div class="hw-header" ontouchend="toggleHistWeek(this)"><div><div class="hw-label">${fmtWeek(wk)}</div>${isCur?'<div class="hw-current">CURRENT WEEK</div>':''}</div><div class="hw-total ${type}">${tot} <span style="font-size:.62rem;font-family:'DM Mono';color:var(--muted2)">REPS</span></div></div><div class="hw-body">${drows}</div></div>`;
