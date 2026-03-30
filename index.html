@@ -268,11 +268,12 @@ function fmtWeek(str){
 function fmtWeekShort(str){return mondayDate(str).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}).toUpperCase();}
 
 function getWeekNumber(d){
-  const date = new Date(d.getTime());
-  date.setHours(0, 0, 0, 0);
-  date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-  const week1 = new Date(date.getFullYear(), 0, 4);
-  return 1 + Math.round(((date - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+  const START_DATE = new Date(2026, 2, 16); // 16 March 2026
+  const startMonday = mondayDate(mondayStr(START_DATE));
+  const weekMonday = mondayDate(mondayStr(d));
+  const diffMs = weekMonday - startMonday;
+  const weeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1;
+  return Math.max(1, weeks);
 }
 
 const HISTORY_KEY='repjournal_v3';
