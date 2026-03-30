@@ -67,8 +67,7 @@
   .rep-btn:active{background:var(--border);}
   .done-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:1rem;line-height:1;cursor:pointer;transition:background .1s;margin-left:6px;}
   .done-btn:active{background:var(--border);}
-  .set-timer{width:60px;text-align:center;font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted2);margin-left:8px;}
-  .set-timer.active{color:var(--text);font-weight:700;}
+  .rep-prev{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--muted);padding:4px 0;min-width:56px;}
   .done-btn{width:100%;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:1px;line-height:1;}
   .set-done{opacity:0.85;border-color:var(--pull);box-shadow:0 0 0 1px rgba(200,245,90,0.2);}
   .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
@@ -182,13 +181,13 @@
   .no-data{text-align:center;padding:34px 20px;color:var(--muted2);font-size:0.6rem;letter-spacing:2px;}
 
   /* TIMER */
-  .timer-panel{display:none;position:fixed;left:0;right:0;bottom:0;height:70px;background:var(--surface);border-top:1px solid var(--border);padding:12px 20px;align-items:center;justify-content:flex-start;gap:16px;z-index:150;}
+  .timer-panel{display:none;position:fixed;left:0;right:0;bottom:0;height:70px;background:var(--surface);border-top:1px solid var(--border);padding:12px 20px;align-items:center;justify-content:flex-start;gap:16px;z-index:150;pointer-events:none;}
   .timer-panel.active{display:flex;}
   .timer-info{font-size:0.63rem;color:var(--muted2);letter-spacing:3px;}
   .timer-display{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--text);min-width:50px;}
   .timer-display.pull{color:var(--pull);}
   .timer-display.dip{color:var(--dip);}
-  .timer-skip{padding:8px 16px;border:1px solid var(--border);background:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;}
+  .timer-skip{padding:8px 16px;border:1px solid var(--border);background:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;pointer-events:auto;}
 </style>
 </head>
 <body>
@@ -392,11 +391,11 @@ function renderTabs(){
 function renderStdSets(day,ds,type){
   let h='';
   for(let s=0;s<day.sets;s++){
-    const isPrev = ds[`set_${s}`] === undefined;
-    const val = isPrev ? getPrevSetReps(day.id, s) : ds[`set_${s}`];
+    const val = ds[`set_${s}`] !== undefined ? ds[`set_${s}`] : 0;
+    const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
-    const cc = (val === 0 || isPrev) ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" onclick="chRep(${day.id},${s},-1)" ontouchstart="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" onclick="promptRep(${day.id},${s})" ontouchstart="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" onclick="chRep(${day.id},${s},1)" ontouchstart="chRep(${day.id},${s},1)">+</button></div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})" ontouchstart="completeSet(${day.id},${s})">✓</button></div></div></div>`;
+    const cc = val === 0 ? 'zero' : type;
+    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" onclick="chRep(${day.id},${s},-1)" ontouchstart="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" onclick="promptRep(${day.id},${s})" ontouchstart="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" onclick="chRep(${day.id},${s},1)" ontouchstart="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})" ontouchstart="completeSet(${day.id},${s})">✓</button></div></div></div>`;
   }
   return h;
 }
@@ -442,13 +441,13 @@ function renderLog(){
   document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(CURRENT_WEEK) + ')';
 }
 
-function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:getPrevSetReps(dayId,si);ds[k]=Math.max(0,current+delta);persist();renderLog();}
-function promptRep(dayId,si){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:getPrevSetReps(dayId,si);const v=prompt(`Reps for Set ${si+1}:`,current);if(v!==null&&!isNaN(parseInt(v))){ds[k]=Math.max(0,parseInt(v));persist();renderLog();}}
+function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);persist();renderLog();}
+function promptRep(dayId,si){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;const v=prompt(`Reps for Set ${si+1}:`,current);if(v!==null&&!isNaN(parseInt(v))){ds[k]=Math.max(0,parseInt(v));persist();renderLog();}}
 function completeSet(dayId,si){
   const day=DAYS[dayId];
   const ds=dayState(state,dayId);
   const k=`set_${si}`;
-  const current=ds[k]!==undefined?ds[k]:getPrevSetReps(dayId,si);
+  const current=ds[k]!==undefined?ds[k]:0;
   ds[k]=Math.max(0,current);
   ds[`${k}_done`]=true;
   persist();
