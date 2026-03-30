@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>REP JOURNAL</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -61,11 +61,11 @@
   .rep-input-row{display:flex;align-items:center;gap:10px;}
   .rep-label{font-size:0.58rem;color:var(--muted2);letter-spacing:1px;width:26px;}
   .rep-controls{display:flex;align-items:center;flex:1;}
-  .rep-btn{width:36px;height:36px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;transition:background .1s;-webkit-tap-highlight-color:transparent;}
+  .rep-btn{width:36px;height:36px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;transition:background .1s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
   .rep-btn:first-child{border-radius:6px 0 0 6px;}
   .rep-btn:last-child {border-radius:0 6px 6px 0;}
   .rep-btn:active{background:var(--border);}
-  .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;}
+  .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
   .rep-value.pull{color:var(--pull);}
   .rep-value.dip {color:var(--dip);}
   .rep-value.zero{color:var(--muted);}
