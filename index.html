@@ -65,6 +65,8 @@
   .rep-btn:first-child{border-radius:6px 0 0 6px;}
   .rep-btn:last-child {border-radius:0 6px 6px 0;}
   .rep-btn:active{background:var(--border);}
+  .done-btn{width:100%;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:1px;line-height:1;}
+  .set-done{opacity:0.85;border-color:var(--pull);box-shadow:0 0 0 1px rgba(200,245,90,0.2);}
   .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
   .rep-value.pull{color:var(--pull);}
   .rep-value.dip {color:var(--dip);}
@@ -311,10 +313,12 @@ function switchView(v){
 
 // ── TIMER ─────────────────────────────────────────────────────────────────────
 let timerInt=null,timerSecs=30;
-function startTimer(type){
-  timerSecs=30;
+function startTimer(workoutType, duration){
+  const defaultDur = workoutType==='max'?300:workoutType==='volume'?60:workoutType==='ladder'?30:30;
+  timerSecs = Number.isFinite(duration)?duration:defaultDur;
   const disp=document.getElementById('timerDisplay');
-  disp.className='timer-display '+type; disp.textContent='30';
+  disp.className='timer-display '+(workoutType==='ladder'?'pull':(workoutType==='max'?'dip':workoutType));
+  disp.textContent=String(timerSecs).padStart(2,'0');
   document.getElementById('timerOverlay').classList.add('active');
   clearInterval(timerInt);
   timerInt=setInterval(()=>{timerSecs--;disp.textContent=String(timerSecs).padStart(2,'0');if(timerSecs<=0)skipTimer();},1000);
@@ -356,8 +360,10 @@ function renderStdSets(day,ds,type){
   for(let s=0;s<day.sets;s++){
     const isPrev = ds[`set_${s}`] === undefined;
     const val = isPrev ? getPrevSetReps(day.id, s) : ds[`set_${s}`];
+    const done = ds[`set_${s}_done`];
     const cc = (val === 0 || isPrev) ? 'zero' : type;
-    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" onclick="chRep(${day.id},${s},-1)" ontouchstart="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" onclick="promptRep(${day.id},${s})" ontouchstart="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" onclick="chRep(${day.id},${s},1)" ontouchstart="chRep(${day.id},${s},1)">+</button></div></div></div></div>`;
+    const doneIndicator = done ? '<span style="font-size:0.6rem;color:#8cc;letter-spacing:1px;"> DONE</span>' : '';
+    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}${doneIndicator}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" onclick="chRep(${day.id},${s},-1)" ontouchstart="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" onclick="promptRep(${day.id},${s})" ontouchstart="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" onclick="chRep(${day.id},${s},1)" ontouchstart="chRep(${day.id},${s},1)">+</button></div></div><div class="rep-input-row"><button class="rep-btn done-btn" onclick="completeSet(${day.id},${s})" ontouchstart="completeSet(${day.id},${s})">DONE</button></div></div></div>`;
   }
   return h;
 }
@@ -406,8 +412,18 @@ function renderLog(){
 
 function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:getPrevSetReps(dayId,si);ds[k]=Math.max(0,current+delta);persist();renderLog();}
 function promptRep(dayId,si){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:getPrevSetReps(dayId,si);const v=prompt(`Reps for Set ${si+1}:`,current);if(v!==null&&!isNaN(parseInt(v))){ds[k]=Math.max(0,parseInt(v));persist();renderLog();}}
-function addRung(dayId,si,type){const ds=dayState(state,dayId),k=`set_${si}`;if(!ds[k])ds[k]=[];const rungs=ds[k];rungs.push({reps:rungs.length+1,done:false,failed:false});persist();renderLog();if(rungs.length>1)startTimer(type);}
-function toggleRung(dayId,si,ri){const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];if(rungs[ri]&&!rungs[ri].failed){rungs[ri].done=!rungs[ri].done;if(rungs[ri].done)startTimer(DAYS[dayId].type);}persist();renderLog();}
+function completeSet(dayId,si){
+  const day=DAYS[dayId];
+  const ds=dayState(state,dayId);
+  const k=`set_${si}`;
+  const current=ds[k]!==undefined?ds[k]:getPrevSetReps(dayId,si);
+  ds[k]=Math.max(0,current);
+  ds[`${k}_done`]=true;
+  persist();
+  startTimer(day.workout);
+  renderLog();
+}
+function addRung(dayId,si,type){const ds=dayState(state,dayId),k=`set_${si}`;if(!ds[k])ds[k]=[];const rungs=ds[k];rungs.push({reps:rungs.length+1,done:false,failed:false});persist();renderLog();if(rungs.length>1)startTimer('ladder',30);}function toggleRung(dayId,si,ri){const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];if(rungs[ri]&&!rungs[ri].failed){rungs[ri].done=!rungs[ri].done;if(rungs[ri].done)startTimer('ladder',30);}persist();renderLog();}
 function failRung(dayId,si,ri){const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];if(rungs[ri]){rungs[ri].failed=!rungs[ri].failed;rungs[ri].done=false;}persist();renderLog();}
 function resetWeek(){if(!confirm('Reset all data for this week?'))return;history[CURRENT_WEEK]={};state=history[CURRENT_WEEK];saveHistory(history);renderLog();}
 
