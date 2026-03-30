@@ -8,7 +8,7 @@
 <style>
   :root {
     --bg:#0d0d0d; --surface:#161616; --surface2:#1e1e1e;
-    --border:#2a2a2a; --pull:#c8f55a; --dip:#ff6b35;
+    --border:#2a2a2a; --pull:#f0f0f0; --dip:#f0f0f0;
     --text:#f0f0f0; --muted:#444; --muted2:#777;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -81,13 +81,13 @@
   .rung-row{display:flex;align-items:center;gap:8px;}
   .rung-num{font-size:0.56rem;color:var(--muted2);width:46px;letter-spacing:1px;flex-shrink:0;}
   .rung-toggle{flex:1;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;user-select:none;}
-  .rung-toggle.done.pull{background:rgba(200,245,90,.08);border-color:var(--pull);color:var(--pull);}
-  .rung-toggle.done.dip {background:rgba(255,107,53,.08);border-color:var(--dip); color:var(--dip);}
-  .rung-toggle.failed{background:rgba(255,60,60,.05);border-color:#ff3c3c33;color:#ff3c3c55;text-decoration:line-through;}
+  .rung-toggle.done.pull{background:rgba(240,240,240,.08);border-color:var(--pull);color:var(--pull);}
+  .rung-toggle.done.dip {background:rgba(240,240,240,.08);border-color:var(--dip); color:var(--dip);}
+  .rung-toggle.failed{background:rgba(170,170,170,.05);border-color:#aaaaaa33;color:#aaaaaa55;text-decoration:line-through;}
   .add-rung-btn{width:100%;height:28px;border:1px dashed var(--border);border-radius:6px;background:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:1px;cursor:pointer;transition:all .12s;margin-top:3px;}
   .add-rung-btn:hover{border-color:var(--text);color:var(--text);}
   .fail-btn{width:26px;height:26px;border:1px solid var(--border);border-radius:5px;background:none;color:var(--muted2);font-size:0.7rem;cursor:pointer;flex-shrink:0;transition:all .12s;}
-  .fail-btn:hover{border-color:#ff3c3c;color:#ff3c3c;}
+  .fail-btn:hover{border-color:#aaaaaa;color:#aaaaaa;}
 
   /* WEEK SUMMARY */
   .week-summary{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:22px;}
@@ -98,7 +98,7 @@
   .week-stat .val.pull{color:var(--pull);}
   .week-stat .val.dip {color:var(--dip);}
   .reset-btn{margin-top:14px;width:100%;padding:9px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:2px;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent;}
-  .reset-btn:hover{border-color:#ff3c3c;color:#ff3c3c;}
+  .reset-btn:hover{border-color:#aaaaaa;color:#aaaaaa;}
 
   /* ── PAST ENTRY VIEW ── */
   .past-view{padding:18px 20px;}
@@ -139,7 +139,7 @@
   }
   .ladder-entry-row input[type=number]:focus{border-color:var(--muted2);}
   .ladder-entry-row .le-remove{width:26px;height:26px;border:1px solid var(--border);border-radius:5px;background:none;color:var(--muted2);font-size:0.7rem;cursor:pointer;flex-shrink:0;transition:all .12s;}
-  .ladder-entry-row .le-remove:hover{border-color:#ff3c3c;color:#ff3c3c;}
+  .ladder-entry-row .le-remove:hover{border-color:#aaaaaa;color:#aaaaaa;}
   .add-ladder-rung-btn{margin:4px 14px 12px;height:28px;border:1px dashed var(--border);border-radius:6px;background:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:1px;cursor:pointer;transition:all .12s;display:block;width:calc(100% - 28px);}
   .add-ladder-rung-btn:hover{border-color:var(--text);color:var(--text);}
 
@@ -156,8 +156,8 @@
   .progress-subtitle{font-size:0.58rem;color:var(--muted2);letter-spacing:2px;margin-bottom:16px;}
   .type-toggle{display:flex;gap:8px;margin-bottom:18px;}
   .type-btn{flex:1;padding:9px;border:1px solid var(--border);background:none;font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;transition:all .12s;color:var(--muted2);}
-  .type-btn.active.pull{background:rgba(200,245,90,.1);border-color:var(--pull);color:var(--pull);}
-  .type-btn.active.dip {background:rgba(255,107,53,.1);border-color:var(--dip); color:var(--dip);}
+  .type-btn.active.pull{background:rgba(240,240,240,.1);border-color:var(--pull);color:var(--pull);}
+  .type-btn.active.dip {background:rgba(240,240,240,.1);border-color:var(--dip); color:var(--dip);}
   .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px;margin-bottom:13px;}
   .chart-title{font-size:0.56rem;color:var(--muted2);letter-spacing:2px;margin-bottom:13px;}
 
@@ -638,14 +638,12 @@ function renderProgress(){
   const pc=document.getElementById('progressContent');
   const weeks=Object.keys(history).sort();
   const type=progressType;
-  const color=type==='pull'?'#c8f55a':'#ff6b35';
-  const colorA=type==='pull'?'rgba(200,245,90,.12)':'rgba(255,107,53,.12)';
+  const color='#f0f0f0';
+  const colorA='rgba(240,240,240,.12)';
   const wkLabels=[],wkTotals=[];
   weeks.forEach(wk=>{wkLabels.push(fmtWeekShort(wk));const wt=weekTotals(history[wk]||{});wkTotals.push(type==='pull'?wt.pull:wt.dip);});
   const typeDays=DAYS.filter(d=>d.type===type);
-  const dayPalette=['#c8f55a','#88d94b','#3da64a'];
-  const dipPalette=['#ff6b35','#ff8c5a','#e05a2a'];
-  const palette=type==='pull'?dayPalette:dipPalette;
+  const palette=['#f0f0f0','#cccccc','#aaaaaa'];
   const dayDatasets=typeDays.map((day,i)=>({
     label:day.name,
     data:weeks.map(wk=>dayTotal(history[wk]||{},day.id)),
