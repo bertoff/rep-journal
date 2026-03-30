@@ -205,9 +205,9 @@
 </header>
 
 <div class="nav-bar">
-  <button class="nav-btn active" id="navLog"      ontouchstart="switchView('log')">LOG</button>
-  <button class="nav-btn"        id="navPast"     ontouchstart="switchView('past')">HISTORY</button>
-  <button class="nav-btn"        id="navProgress" ontouchstart="switchView('progress')">PROGRESS</button>
+  <button class="nav-btn active" id="navLog"      ontouchend="switchView('log')">LOG</button>
+  <button class="nav-btn"        id="navPast"     ontouchend="switchView('past')">HISTORY</button>
+  <button class="nav-btn"        id="navProgress" ontouchend="switchView('progress')">PROGRESS</button>
 </div>
 
 <!-- LOG VIEW -->
@@ -385,7 +385,7 @@ function renderTabs(){
     const b=document.createElement('button');
     b.className=`day-tab ${day.type}${day.id===activeDay?' active':''}`;
     b.innerHTML=`<span class="dot"></span>${day.name}${day.id===today?' ●':''}`;
-    b.ontouchstart=()=>{activeDay=day.id;renderLog();};
+    b.ontouchend=()=>{activeDay=day.id;renderLog();};
     c.appendChild(b);
   });
 }
@@ -397,7 +397,7 @@ function renderStdSets(day,ds,type){
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchstart="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" ontouchstart="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" ontouchstart="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchstart="completeSet(${day.id},${s})">✓</button></div></div></div>`;
+    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" ontouchend="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})">✓</button></div></div></div>`;
   }
   return h;
 }
@@ -411,9 +411,9 @@ function renderLadderSets(day,ds,type){
     rungs.forEach((r,ri)=>{
       const sc=r.failed?'failed':(r.done?`done ${type}`:'');
       const ic=r.failed?'✕':(r.done?'✓':'○');
-      rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}×)</div><button class="rung-toggle ${sc}" ontouchstart="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchstart="failRung(${day.id},${s},${ri})">✕</button></div>`;
+      rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}×)</div><button class="rung-toggle ${sc}" ontouchend="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchend="failRung(${day.id},${s},${ri})">✕</button></div>`;
     });
-    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS<span class="set-timer" id="setTimer_${day.id}_${s}"></span></div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" ontouchstart="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
+    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS<span class="set-timer" id="setTimer_${day.id}_${s}"></span></div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" ontouchend="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
   }
   return h;
 }
@@ -435,7 +435,7 @@ function renderLog(){
         <div class="week-stat"><div class="label">PULL UPS</div><div class="val pull">${wt.pull}</div></div>
         <div class="week-stat"><div class="label">DIPS</div><div class="val dip">${wt.dip}</div></div>
       </div>
-      <button class="reset-btn" ontouchstart="resetWeek()">RESET THIS WEEK</button>
+      <button class="reset-btn" ontouchend="resetWeek()">RESET THIS WEEK</button>
     </div>`;
   const today=getToday();
   document.getElementById('todayLabel').textContent=today<6?DAYS[today].name:'REST';
@@ -514,7 +514,7 @@ function renderPastDayTabs(){
     const b=document.createElement('button');
     b.className=`past-day-tab ${day.type}${day.id===pastActiveDay?' active':''}`;
     b.innerHTML=`<span class="dot"></span>${day.name}`;
-    b.ontouchstart=()=>{pastActiveDay=day.id;renderPastDayTabs();renderPastSets();};
+    b.ontouchend=()=>{pastActiveDay=day.id;renderPastDayTabs();renderPastSets();};
     c.appendChild(b);
   });
 }
@@ -540,7 +540,7 @@ function renderPastSets(){
         rh+=`<div class="ladder-entry-row">
           <div class="le-label">RUNG ${ri+1} (${ri+1} REP${ri+1>1?'S':''})</div>
           <input type="number" min="0" value="${r.reps||ri+1}" readonly style="opacity:0.5;width:60px;flex:none;">
-          <button class="le-remove" ontouchstart="pastRemoveRung(${s},${ri})">✕</button>
+          <button class="le-remove" ontouchend="pastRemoveRung(${s},${ri})">✕</button>
         </div>`;
       });
       const setTot = rungs.reduce((a,r)=>a+r.reps,0);
@@ -550,7 +550,7 @@ function renderPastSets(){
           <div style="font-size:0.6rem;color:var(--muted2)"><span style="font-family:'Bebas Neue',sans-serif;font-size:0.9rem;color:var(--${type})">${setTot}</span> REPS</div>
         </div>
         ${rh}
-        <button class="add-ladder-rung-btn" ontouchstart="pastAddRung(${s})">+ ADD RUNG (${rungs.length+1} REPS)</button>
+        <button class="add-ladder-rung-btn" ontouchend="pastAddRung(${s})">+ ADD RUNG (${rungs.length+1} REPS)</button>
       </div>`;
     }
     h+=`</div>`;
@@ -569,9 +569,9 @@ function renderPastSets(){
           <div class="rep-input-row">
             <div class="rep-label">REPS</div>
             <div class="rep-controls">
-              <button class="rep-btn" ontouchstart="pastChRep(${s},-1)">−</button>
-              <div class="rep-value ${cc}" id="past_rep_${s}" ontouchstart="pastPromptRep(${s})">${val}</div>
-              <button class="rep-btn" ontouchstart="pastChRep(${s},1)">+</button>
+              <button class="rep-btn" ontouchend="pastChRep(${s},-1)">−</button>
+              <div class="rep-value ${cc}" id="past_rep_${s}" ontouchend="pastPromptRep(${s})">${val}</div>
+              <button class="rep-btn" ontouchend="pastChRep(${s},1)">+</button>
             </div>
           </div>
         </div>
@@ -583,7 +583,7 @@ function renderPastSets(){
 }
 
 function saveBtnHtml(type){
-  return `<button class="save-past-btn ${type}" ontouchstart="savePastDay()" style="margin-top:14px">SAVE THIS DAY ›</button>
+  return `<button class="save-past-btn ${type}" ontouchend="savePastDay()" style="margin-top:14px">SAVE THIS DAY ›</button>
           <div class="save-toast" id="saveToast"></div>`;
 }
 
@@ -705,7 +705,7 @@ function renderProgress(){
         const t=dayTotal(wd,day.id);
         drows+=`<div class="hw-day-row"><span class="hw-day-name">${day.label}</span><span class="hw-day-val ${type}">${t}</span></div>`;
       });
-      histHtml+=`<div class="history-week"><div class="hw-header" ontouchstart="toggleHistWeek(this)"><div><div class="hw-label">${fmtWeek(wk)}</div>${isCur?'<div class="hw-current">CURRENT WEEK</div>':''}</div><div class="hw-total ${type}">${tot} <span style="font-size:.62rem;font-family:'DM Mono';color:var(--muted2)">REPS</span></div></div><div class="hw-body">${drows}</div></div>`;
+      histHtml+=`<div class="history-week"><div class="hw-header" ontouchend="toggleHistWeek(this)"><div><div class="hw-label">${fmtWeek(wk)}</div>${isCur?'<div class="hw-current">CURRENT WEEK</div>':''}</div><div class="hw-total ${type}">${tot} <span style="font-size:.62rem;font-family:'DM Mono';color:var(--muted2)">REPS</span></div></div><div class="hw-body">${drows}</div></div>`;
     });
   }
 
@@ -713,8 +713,8 @@ function renderProgress(){
     <h2>PROGRESS</h2>
     <div class="progress-subtitle">YOUR GROWTH OVER TIME</div>
     <div class="type-toggle">
-      <button class="type-btn ${type==='pull'?'active pull':''}" ontouchstart="setProgressType('pull')">PULL UPS</button>
-      <button class="type-btn ${type==='dip'?'active dip':''}"  ontouchstart="setProgressType('dip')">DIPS</button>
+      <button class="type-btn ${type==='pull'?'active pull':''}" ontouchend="setProgressType('pull')">PULL UPS</button>
+      <button class="type-btn ${type==='dip'?'active dip':''}"  ontouchend="setProgressType('dip')">DIPS</button>
     </div>
     <div class="chart-card"><div class="chart-title">WEEKLY TOTAL REPS</div><canvas id="weeklyChart" height="155"></canvas></div>
     <div class="chart-card"><div class="chart-title">REPS PER SESSION (BY DAY)</div><canvas id="dayChart" height="185"></canvas></div>
@@ -751,7 +751,7 @@ renderLog();
 <div class="timer-panel" id="timerPanel">
   <div class="timer-info" id="timerInfo">REST</div>
   <div class="timer-display" id="timerDisplay">00:00</div>
-  <button class="timer-skip" ontouchstart="skipTimer()">SKIP</button>
+  <button class="timer-skip" ontouchend="skipTimer()">SKIP</button>
 </div>
 
 </body>
