@@ -408,7 +408,6 @@ function renderLog(){
     <div><div class="workout-title ${type}">${type==='pull'?'PULL UPS':'DIPS'}</div><div class="workout-subtitle">${WORKOUT_LABELS[day.workout]}</div></div>
     <div class="totals-bar">
       <div class="total-card ${type}"><div class="label">TODAY</div><div class="number">${tot}</div></div>
-      <div class="total-card ${type}"><div class="label">WEEK (${type==='pull'?'PULL':'DIP'})</div><div class="number">${type==='pull'?wt.pull:wt.dip}</div></div>
     </div>
     <div class="sets-container">${setsHtml}</div>
     <div class="week-summary">
