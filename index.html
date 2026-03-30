@@ -394,7 +394,7 @@ function renderLadderSets(day,ds,type){
       const ic=r.failed?'✕':(r.done?'✓':'○');
       rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}×)</div><button class="rung-toggle ${sc}" onclick="toggleRung(${day.id},${s},${ri})" ontouchstart="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" onclick="failRung(${day.id},${s},${ri})" ontouchstart="failRung(${day.id},${s},${ri})">✕</button></div>`;
     });
-    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS</div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" onclick="addRung(${day.id},${s},'${type}')" ontouchstart="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
+    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS<span class="set-timer" id="setTimer_${day.id}_${s}"></span></div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" onclick="addRung(${day.id},${s},'${type}')" ontouchstart="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
   }
   return h;
 }
@@ -437,7 +437,7 @@ function completeSet(dayId,si){
   startTimer(day.workout, dayId, si);
   renderLog();
 }
-function addRung(dayId,si,type){const ds=dayState(state,dayId),k=`set_${si}`;if(!ds[k])ds[k]=[];const rungs=ds[k];rungs.push({reps:rungs.length+1,done:false,failed:false});persist();renderLog();startTimer('ladder',dayId,si,30);}function toggleRung(dayId,si,ri){const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];if(rungs[ri]&&!rungs[ri].failed){rungs[ri].done=!rungs[ri].done;if(rungs[ri].done)startTimer('ladder',dayId,si,30);}persist();renderLog();}
+function addRung(dayId,si,type){const ds=dayState(state,dayId),k=`set_${si}`;if(!ds[k])ds[k]=[];const rungs=ds[k];if(rungs.length>0){rungs[rungs.length-1].done=true;}rungs.push({reps:rungs.length+1,done:false,failed:false});persist();renderLog();startTimer('ladder',dayId,si,30);}function toggleRung(dayId,si,ri){const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];if(rungs[ri]&&!rungs[ri].failed){rungs[ri].done=!rungs[ri].done;if(rungs[ri].done)startTimer('ladder',dayId,si,30);}persist();renderLog();}
 function failRung(dayId,si,ri){const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];if(rungs[ri]){rungs[ri].failed=!rungs[ri].failed;rungs[ri].done=false;}persist();renderLog();}
 function resetWeek(){if(!confirm('Reset all data for this week?'))return;history[CURRENT_WEEK]={};state=history[CURRENT_WEEK];saveHistory(history);renderLog();}
 
