@@ -444,7 +444,7 @@ function renderLog(){
 }
 
 function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);persist();renderLog();}
-function promptRep(dayId,si){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;const v=prompt(`Reps for Set ${si+1}:`,current);if(v!==null&&!isNaN(parseInt(v))){ds[k]=Math.max(0,parseInt(v));persist();renderLog();}}
+function promptRep(dayId,si){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:'';const v=prompt(`Reps for Set ${si+1}:`,current);if(v!==null&&!isNaN(parseInt(v))){ds[k]=Math.max(0,parseInt(v));persist();renderLog();}}
 function completeSet(dayId,si){
   const day=DAYS[dayId];
   const ds=dayState(state,dayId);
@@ -598,7 +598,7 @@ function pastPromptRep(si){
   if(!pastWeekKey) return;
   const fd=pastFormData[pastWeekKey][pastActiveDay];
   const k=`set_${si}`;
-  const v=prompt(`Reps for Set ${si+1}:`,fd[k]||0);
+  const v=prompt(`Reps for Set ${si+1}:`,fd[k]||'');
   if(v!==null&&!isNaN(parseInt(v))){fd[k]=Math.max(0,parseInt(v));renderPastSets();}
 }
 function pastAddRung(si){
