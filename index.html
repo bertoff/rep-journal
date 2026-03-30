@@ -261,8 +261,19 @@ function mondayStr(d=new Date()){
   return `${m.getFullYear()}_${String(m.getMonth()+1).padStart(2,'0')}_${String(m.getDate()).padStart(2,'0')}`;
 }
 function mondayDate(str){const[y,mo,d]=str.split('_').map(Number);return new Date(y,mo-1,d);}
-function fmtWeek(str){return mondayDate(str).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();}
+function fmtWeek(str){
+  const d = mondayDate(str);
+  return d.toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'numeric'});
+}
 function fmtWeekShort(str){return mondayDate(str).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}).toUpperCase();}
+
+function getWeekNumber(d){
+  const date = new Date(d.getTime());
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+  const week1 = new Date(date.getFullYear(), 0, 4);
+  return 1 + Math.round(((date - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+}
 
 const HISTORY_KEY='repjournal_v3';
 const CURRENT_WEEK=mondayStr();
@@ -274,6 +285,16 @@ let history=loadHistory();
 if(!history[CURRENT_WEEK])history[CURRENT_WEEK]={};
 let state=history[CURRENT_WEEK];
 function persist(){history[CURRENT_WEEK]=state;saveHistory(history);}
+
+const weeks = Object.keys(history).sort();
+const prevWeekKey = weeks.length > 0 && weeks.indexOf(CURRENT_WEEK) > 0 ? weeks[weeks.indexOf(CURRENT_WEEK) - 1] : null;
+
+function getPrevSetReps(dayId, setIdx){
+  if(!prevWeekKey) return 0;
+  const prevData = history[prevWeekKey] || {};
+  const dayData = prevData[dayId] || {};
+  return dayData[`set_${setIdx}`] || 0;
+}
 
 // ── VIEW SWITCHING ────────────────────────────────────────────────────────────
 let currentView='log';
@@ -331,7 +352,9 @@ function renderTabs(){
 function renderStdSets(day,ds,type){
   let h='';
   for(let s=0;s<day.sets;s++){
-    const val=ds[`set_${s}`]||0,cc=val===0?'zero':type;
+    const isPrev = ds[`set_${s}`] === undefined;
+    const val = isPrev ? getPrevSetReps(day.id, s) : ds[`set_${s}`];
+    const cc = (val === 0 || isPrev) ? 'zero' : type;
     h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" onclick="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" onclick="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" onclick="chRep(${day.id},${s},1)">+</button></div></div></div></div>`;
   }
   return h;
@@ -375,7 +398,8 @@ function renderLog(){
     </div>`;
   const today=getToday();
   document.getElementById('todayLabel').textContent=today<6?DAYS[today].name:'REST';
-  document.getElementById('weekLabel').textContent='WEEK OF '+fmtWeek(CURRENT_WEEK);
+  const weekNum = getWeekNumber(mondayDate(CURRENT_WEEK));
+  document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(CURRENT_WEEK) + ')';
 }
 
 function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;ds[k]=Math.max(0,(ds[k]||0)+delta);persist();renderLog();}
