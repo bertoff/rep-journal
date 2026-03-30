@@ -672,7 +672,7 @@ function renderProgress(){
             setReps = wd[day.id]?.[`set_${s}`] || 0;
           }
           if(setReps > 0){
-            typeSets[dayTypeLabel].push(`Set ${s+1}: ${setReps}`);
+            typeSets[dayTypeLabel].push(`${setReps}`);
           }
         }
       });
