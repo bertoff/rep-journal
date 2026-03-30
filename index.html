@@ -656,45 +656,6 @@ function renderProgress(){
     borderWidth:2,
   }));
 
-  const categories = [
-    {name: 'Max Days', days: type === 'pull' ? [0] : [1]},
-    {name: 'Volume Days', days: type === 'pull' ? [2] : [3]},
-    {name: 'Ladder Days', days: type === 'pull' ? [4] : [5]}
-  ];
-  let statsHtml = '';
-  categories.forEach(cat => {
-    let totalReps = 0;
-    let totalSets = 0;
-    weeks.forEach(wk => {
-      const wd = history[wk] || {};
-      cat.days.forEach(dayId => {
-        const day = DAYS[dayId];
-        const ds = wd[dayId] || {};
-        if (day.workout === 'ladder') {
-          for (let s = 0; s < day.sets; s++) {
-            const rungs = ds[`set_${s}`] || [];
-            let setTotal = 0;
-            rungs.forEach(r => { if (!r.failed) setTotal += r.reps; });
-            if (setTotal > 0) {
-              totalReps += setTotal;
-              totalSets += 1;
-            }
-          }
-        } else {
-          for (let s = 0; s < day.sets; s++) {
-            const setReps = ds[`set_${s}`] || 0;
-            if (setReps > 0) {
-              totalReps += setReps;
-              totalSets += 1;
-            }
-          }
-        }
-      });
-    });
-    const avg = totalSets > 0 ? (totalReps / totalSets).toFixed(1) : '0';
-    statsHtml += `<div class="week-stat"><div class="label">${cat.name}</div><div class="val ${type}">${totalReps} REPS</div><div class="label" style="font-size:0.5rem;margin-top:2px;">${avg} AVG/SET</div></div>`;
-  });
-
   let histHtml='';
   if(weeks.length===0){histHtml='<div class="no-data">NO DATA YET — START LOGGING!</div>';}
   else{
@@ -702,9 +663,19 @@ function renderProgress(){
       const wd=history[wk]||{},wt=weekTotals(wd),tot=type==='pull'?wt.pull:wt.dip,isCur=wk===CURRENT_WEEK;
       let drows='';
       DAYS.filter(d=>d.type===type).forEach(day=>{
-        const t=dayTotal(wd,day.id);
         const dayTypeLabel = day.workout === 'max' ? 'Max Days' : day.workout === 'volume' ? 'Sub Max Volume' : 'Ladder Volume';
-        drows+=`<div class="hw-day-row"><span class="hw-day-name">${dayTypeLabel}</span><span class="hw-day-val ${type}">${t}</span></div>`;
+        for(let s=0; s<day.sets; s++){
+          let setReps = 0;
+          if(day.workout === 'ladder'){
+            const rungs = wd[day.id]?.[`set_${s}`] || [];
+            rungs.forEach(r => { if(!r.failed) setReps += r.reps; });
+          } else {
+            setReps = wd[day.id]?.[`set_${s}`] || 0;
+          }
+          if(setReps > 0){
+            drows+=`<div class="hw-day-row"><span class="hw-day-name">${dayTypeLabel} - Set ${s+1}</span><span class="hw-day-val ${type}">${setReps}</span></div>`;
+          }
+        }
       });
       histHtml+=`<div class="history-week"><div class="hw-header" ontouchend="toggleHistWeek(this)"><div><div class="hw-label">${fmtWeek(wk)}</div>${isCur?'<div class="hw-current">CURRENT WEEK</div>':''}</div><div class="hw-total ${type}">${tot} <span style="font-size:.62rem;font-family:'DM Mono';color:var(--muted2)">REPS</span></div></div><div class="hw-body">${drows}</div></div>`;
     });
@@ -719,12 +690,6 @@ function renderProgress(){
     </div>
     <div class="chart-card"><div class="chart-title">WEEKLY TOTAL REPS</div><canvas id="weeklyChart" height="155"></canvas></div>
     <div class="chart-card"><div class="chart-title">REPS PER SESSION (BY DAY)</div><canvas id="dayChart" height="185"></canvas></div>
-    <div class="week-summary">
-      <h2>WORKOUT STATS</h2>
-      <div class="week-grid">
-        ${statsHtml}
-      </div>
-    </div>
     <div class="section-label">WEEK HISTORY</div>${histHtml}`;
 
   if(chartWeekly){chartWeekly.destroy();chartWeekly=null;}
