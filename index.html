@@ -309,10 +309,12 @@ function switchView(v){
 }
 
 // ── TIMER ─────────────────────────────────────────────────────────────────────
-let timerInt=null,timerSecs=0,timerTarget=null;
+let timerInt=null, timerSecs=0, timerTarget=null, timerEnd=0;
 function startTimer(workoutType, dayId, setIdx, duration){
   const defaultDur = workoutType==='max'?300:workoutType==='volume'?60:workoutType==='ladder'?30:30;
-  timerSecs = Number.isFinite(duration)?duration:defaultDur;
+  const initialSecs = Number.isFinite(duration)?duration:defaultDur;
+  timerSecs = initialSecs;
+  timerEnd = Date.now() + initialSecs * 1000;
   timerTarget = `setTimer_${dayId}_${setIdx}`;
   
   const panel = document.getElementById('timerPanel');
@@ -323,13 +325,24 @@ function startTimer(workoutType, dayId, setIdx, duration){
   info.textContent = label;
   disp.className = 'timer-display ' + (workoutType==='ladder'?'pull':(workoutType==='max'?'dip':'pull'));
   updateGlobalTimerDisplay();
+  updateTimerDisplay();
   panel.classList.add('active');
   document.body.classList.add('timer-active');
   
   clearInterval(timerInt);
-  timerInt=setInterval(()=>{timerSecs--;updateGlobalTimerDisplay();if(timerSecs<=0)skipTimer();},1000);
+  timerInt = setInterval(()=>{
+    const remainingMs = timerEnd - Date.now();
+    timerSecs = Math.max(0, Math.ceil(remainingMs / 1000));
+    updateGlobalTimerDisplay();
+    updateTimerDisplay();
+    if(remainingMs <= 0) skipTimer();
+  }, 250);
 }
 function updateGlobalTimerDisplay(){
+  if(timerEnd>0){
+    const remainingMs = timerEnd - Date.now();
+    timerSecs = Math.max(0, Math.ceil(remainingMs / 1000));
+  }
   const disp = document.getElementById('timerDisplay');
   const mm = String(Math.floor(timerSecs/60)).padStart(2,'0');
   const ss = String(timerSecs%60).padStart(2,'0');
@@ -351,6 +364,7 @@ function updateTimerDisplay(){
 }
 function skipTimer(){
   clearInterval(timerInt);
+  timerEnd = 0;
   const panel = document.getElementById('timerPanel');
   panel.classList.remove('active');
   document.body.classList.remove('timer-active');
