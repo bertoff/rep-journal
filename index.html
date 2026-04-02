@@ -71,10 +71,13 @@
   .rep-prev{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--muted);padding:4px 0;min-width:56px;}
   .done-btn{width:100%;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:1px;line-height:1;}
   .set-done{opacity:0.85;border-color:var(--pull);box-shadow:0 0 0 1px rgba(200,245,90,0.2);}
-  .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
-  .rep-value.pull{color:var(--pull);}
-  .rep-value.dip {color:var(--dip);}
-  .rep-value.zero{color:var(--muted);}
+  .rep-value-input{flex:1;height:36px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);border-left:none;border-right:none;color:var(--text);outline:none;min-width:56px;}
+  .rep-value-input.pull{color:var(--pull);}
+  .rep-value-input.dip {color:var(--dip);}
+  .rep-value-input.zero{color:var(--muted);}
+  .rep-value-input::-webkit-outer-spin-button,
+  .rep-value-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .rep-value-input[type=number]{-moz-appearance:textfield;appearance:textfield;}
 
   /* LADDER */
   .ladder-rungs{padding:8px 14px 12px;display:flex;flex-direction:column;gap:5px;}
@@ -189,6 +192,7 @@
   .timer-display.pull{color:var(--pull);}
   .timer-display.dip{color:var(--dip);}
   .timer-skip{padding:8px 16px;border:1px solid var(--border);background:var(--surface2);color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;pointer-events:auto;}
+
 </style>
 </head>
 <body>
@@ -392,7 +396,7 @@ function renderStdSets(day,ds,type){
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" ontouchend="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><button class="done-btn" ontouchend="completeSet(${day.id},${s})">✓</button></div></div></div>`;
+    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><input class="rep-value-input ${cc}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setRepValue(${day.id},${s},this.value,false)" onchange="setRepValue(${day.id},${s},this.value,true)" onblur="setRepValue(${day.id},${s},this.value,true)"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><button class="done-btn" ontouchend="completeSet(${day.id},${s})">✓</button></div></div></div>`;
   }
   return h;
 }
@@ -438,7 +442,18 @@ function renderLog(){
 }
 
 function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);if(ds[k]===0)ds[`${k}_done`]=false;persist();renderLog();}
-function promptRep(dayId,si){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:'';const v=prompt(`Reps for Set ${si+1}:`,current);if(v!==null&&!isNaN(parseInt(v))){ds[k]=Math.max(0,parseInt(v));if(ds[k]===0)ds[`${k}_done`]=false;persist();renderLog();}}
+function parseRepValue(value){
+  const digits=String(value??'').replace(/\D/g,'');
+  if(!digits) return 0;
+  return Math.max(0,parseInt(digits,10) || 0);
+}
+function setRepValue(dayId,si,value,rerender){
+  const ds=dayState(state,dayId),k=`set_${si}`;
+  ds[k]=parseRepValue(value);
+  if(ds[k]===0)ds[`${k}_done`]=false;
+  persist();
+  if(rerender) renderLog();
+}
 function completeSet(dayId,si){
   const day=DAYS[dayId];
   const ds=dayState(state,dayId);
@@ -564,7 +579,7 @@ function renderPastSets(){
             <div class="rep-label">REPS</div>
             <div class="rep-controls">
               <button class="rep-btn" ontouchend="pastChRep(${s},-1)">−</button>
-              <div class="rep-value ${cc}" id="past_rep_${s}" ontouchend="pastPromptRep(${s})">${val}</div>
+              <input class="rep-value-input ${cc}" id="past_rep_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setPastRepValue(${s},this.value,false)" onchange="setPastRepValue(${s},this.value,true)" onblur="setPastRepValue(${s},this.value,true)">
               <button class="rep-btn" ontouchend="pastChRep(${s},1)">+</button>
             </div>
           </div>
@@ -588,12 +603,12 @@ function pastChRep(si,delta){
   fd[k]=Math.max(0,(fd[k]||0)+delta);
   renderPastSets();
 }
-function pastPromptRep(si){
+function setPastRepValue(si,value,rerender){
   if(!pastWeekKey) return;
   const fd=pastFormData[pastWeekKey][pastActiveDay];
   const k=`set_${si}`;
-  const v=prompt(`Reps for Set ${si+1}:`,fd[k]||'');
-  if(v!==null&&!isNaN(parseInt(v))){fd[k]=Math.max(0,parseInt(v));renderPastSets();}
+  fd[k]=parseRepValue(value);
+  if(rerender) renderPastSets();
 }
 function pastAddRung(si){
   if(!pastWeekKey) return;
