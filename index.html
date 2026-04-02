@@ -257,7 +257,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.02.2';
+const APP_VERSION='2026.04.02.3';
 const WORKOUT_LABELS={max:'MAX DAY — 3 × MAX REPS',volume:'SUB MAX VOLUME - 10 × VOLUME SETS',ladder:'LADDER VOLUME - 5 × LADDER SETS'};
 
 // ── STORAGE ──────────────────────────────────────────────────────────────────
@@ -399,7 +399,7 @@ function renderStdSets(day,ds,type){
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setRepValue(${day.id},${s},this.value,false)" onchange="setRepValue(${day.id},${s},this.value,true)" onblur="setRepValue(${day.id},${s},this.value,true)"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><button class="done-btn" ontouchend="completeSet(${day.id},${s})">✓</button></div></div></div>`;
+    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setRepValue(${day.id},${s},this,false)" onchange="setRepValue(${day.id},${s},this,true)" onblur="setRepValue(${day.id},${s},this,true)"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><button class="done-btn" ontouchend="completeSet(${day.id},${s})">✓</button></div></div></div>`;
   }
   return h;
 }
@@ -451,9 +451,15 @@ function parseRepValue(value){
   if(!digits) return 0;
   return Math.max(0,parseInt(digits,10) || 0);
 }
-function setRepValue(dayId,si,value,rerender){
+function normalizeRepInput(input){
+  let digits=String(input.value??'').replace(/\D/g,'');
+  if(digits.length>1) digits=digits.replace(/^0+/,'') || '0';
+  if(input.value!==digits) input.value=digits;
+  return digits;
+}
+function setRepValue(dayId,si,input,rerender){
   const ds=dayState(state,dayId),k=`set_${si}`;
-  ds[k]=parseRepValue(value);
+  ds[k]=parseRepValue(normalizeRepInput(input));
   if(ds[k]===0)ds[`${k}_done`]=false;
   persist();
   if(rerender) renderLog();
@@ -594,7 +600,7 @@ function renderPastSets(){
             <div class="rep-label">REPS</div>
             <div class="rep-controls">
               <button class="rep-btn" ontouchend="pastChRep(${s},-1)">−</button>
-              <input class="rep-value-input ${cc}" id="past_rep_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setPastRepValue(${s},this.value,false)" onchange="setPastRepValue(${s},this.value,true)" onblur="setPastRepValue(${s},this.value,true)">
+              <input class="rep-value-input ${cc}" id="past_rep_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setPastRepValue(${s},this,false)" onchange="setPastRepValue(${s},this,true)" onblur="setPastRepValue(${s},this,true)">
               <button class="rep-btn" ontouchend="pastChRep(${s},1)">+</button>
             </div>
           </div>
@@ -618,11 +624,11 @@ function pastChRep(si,delta){
   fd[k]=Math.max(0,(fd[k]||0)+delta);
   renderPastSets();
 }
-function setPastRepValue(si,value,rerender){
+function setPastRepValue(si,input,rerender){
   if(!pastWeekKey) return;
   const fd=pastFormData[pastWeekKey][pastActiveDay];
   const k=`set_${si}`;
-  fd[k]=parseRepValue(value);
+  fd[k]=parseRepValue(normalizeRepInput(input));
   if(rerender) renderPastSets();
 }
 function pastPromptRep(si){
