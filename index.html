@@ -77,6 +77,12 @@
   .rep-value.pull{color:var(--pull);}
   .rep-value.dip {color:var(--dip);}
   .rep-value.zero{color:var(--muted);}
+  .rep-value-input{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);border-left:none;border-right:none;padding:4px 0;min-width:56px;color:var(--text);outline:none;appearance:textfield;-moz-appearance:textfield;}
+  .rep-value-input.pull{color:var(--pull);}
+  .rep-value-input.dip {color:var(--dip);}
+  .rep-value-input.zero{color:var(--muted);}
+  .rep-value-input::-webkit-outer-spin-button,
+  .rep-value-input::-webkit-inner-spin-button{appearance:none;margin:0;}
 
   /* LADDER */
   .ladder-rungs{padding:8px 14px 12px;display:flex;flex-direction:column;gap:5px;}
@@ -200,12 +206,12 @@
   <div>
     <h1>REP JOURNAL</h1>
     <div class="week-label" id="weekLabel">—</div>
+    <div class="version-badge" id="versionBadge">BUILD —</div>
+    <div class="build-label" id="buildLabel">BUILD —</div>
   </div>
   <div style="text-align:right">
     <div style="font-size:.53rem;color:var(--muted2);letter-spacing:2px">TODAY</div>
     <div id="todayLabel"></div>
-    <div class="version-badge" id="versionBadge">BUILD —</div>
-    <div class="build-label" id="buildLabel">BUILD —</div>
     <button class="reset-btn" ontouchend="resetWeek()" style="font-size:0.5rem;margin-top:4px;">RESET WEEK</button>
   </div>
 </header>
@@ -256,9 +262,9 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.03.5';
+const APP_VERSION='2026.04.03.7';
 const WORKOUT_LABELS={max:'MAX DAY — 3 × MAX REPS',volume:'SUB MAX VOLUME - 10 × VOLUME SETS',ladder:'LADDER VOLUME - 5 × LADDER SETS'};
-const BUILD_VERSION='v9';
+const BUILD_VERSION='v11';
 
 // ── STORAGE ──────────────────────────────────────────────────────────────────
 function mondayStr(d=new Date()){
@@ -399,7 +405,7 @@ function renderStdSets(day,ds,type){
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" ontouchend="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})">✓</button></div></div></div>`;
+    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="setRepValue(${day.id},${s},this,true)" onblur="setRepValue(${day.id},${s},this,true)"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})">✓</button></div></div></div>`;
   }
   return h;
 }
