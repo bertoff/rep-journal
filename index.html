@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -108,7 +108,7 @@
   .reset-btn{margin-top:14px;width:100%;padding:9px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:2px;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent;}
   .reset-btn:hover{border-color:#aaaaaa;color:#aaaaaa;}
 
-  /* ── PAST ENTRY VIEW ── */
+  /* ?? PAST ENTRY VIEW ?? */
   .past-view{padding:18px 20px;}
   .past-view > h2{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:4px;margin-bottom:4px;}
   .past-view > p{font-size:0.58rem;color:var(--muted2);letter-spacing:1px;margin-bottom:20px;line-height:1.6;}
@@ -205,9 +205,9 @@
 <header>
   <div>
     <h1>REP JOURNAL</h1>
-    <div class="week-label" id="weekLabel">—</div>
-    <div class="version-badge" id="versionBadge">BUILD —</div>
-    <div class="build-label" id="buildLabel">BUILD —</div>
+    <div class="week-label" id="weekLabel">??/div>
+    <div class="version-badge" id="versionBadge">BUILD ??/div>
+    <div class="build-label" id="buildLabel">BUILD ??/div>
   </div>
   <div style="text-align:right">
     <div style="font-size:.53rem;color:var(--muted2);letter-spacing:2px">TODAY</div>
@@ -237,12 +237,12 @@
     <div class="week-picker-card">
       <label>PICK ANY DATE IN THAT WEEK</label>
       <input type="date" id="pastDateInput" onchange="onPastDateChange()">
-      <div class="week-resolved" id="pastWeekResolved">— SELECT A DATE ABOVE —</div>
+      <div class="week-resolved" id="pastWeekResolved">??SELECT A DATE ABOVE ??/div>
     </div>
 
     <div class="past-day-tabs" id="pastDayTabs"></div>
     <div id="pastSetsArea"></div>
-    <div class="save-toast" id="saveToast">✓ SAVED</div>
+    <div class="save-toast" id="saveToast">??SAVED</div>
   </div>
 </div>
 
@@ -253,7 +253,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-// ── CONFIG ───────────────────────────────────────────────────────────────────
+// ?? CONFIG ???????????????????????????????????????????????????????????????????
 const DAYS = [
   {id:0,name:'MON',label:'MONDAY',   type:'pull',workout:'max',   sets:3 },
   {id:1,name:'TUE',label:'TUESDAY',  type:'dip', workout:'max',   sets:3 },
@@ -262,11 +262,11 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.03.8';
-const WORKOUT_LABELS={max:'MAX DAY — 3 × MAX REPS',volume:'SUB MAX VOLUME - 10 × VOLUME SETS',ladder:'LADDER VOLUME - 5 × LADDER SETS'};
-const BUILD_VERSION='v12';
+const APP_VERSION='2026.04.03.9';
+const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
+const BUILD_VERSION='v13';
 
-// ── STORAGE ──────────────────────────────────────────────────────────────────
+// ?? STORAGE ??????????????????????????????????????????????????????????????????
 function mondayStr(d=new Date()){
   const m=new Date(d);
   m.setDate(m.getDate()-((m.getDay()+6)%7));
@@ -310,7 +310,7 @@ function getPrevSetReps(dayId, setIdx){
   return dayData[`set_${setIdx}`] || 0;
 }
 
-// ── VIEW SWITCHING ────────────────────────────────────────────────────────────
+// ?? VIEW SWITCHING ????????????????????????????????????????????????????????????
 let currentView='log';
 function switchView(v){
   currentView=v;
@@ -322,7 +322,7 @@ function switchView(v){
   if(v==='past') initPastView();
 }
 
-// ── TIMER ─────────────────────────────────────────────────────────────────────
+// ?? TIMER ?????????????????????????????????????????????????????????????????????
 let timerInt=null, timerSecs=0, timerTarget=null, timerEnd=0;
 function startTimer(workoutType, dayId, setIdx, duration){
   const defaultDur = workoutType==='max'?300:workoutType==='volume'?60:workoutType==='ladder'?30:30;
@@ -335,7 +335,7 @@ function startTimer(workoutType, dayId, setIdx, duration){
   const info = document.getElementById('timerInfo');
   const disp = document.getElementById('timerDisplay');
   
-  const label = workoutType==='max'?'REST — NEXT SET':'volume'===workoutType?'REST — NEXT SET':'REST — NEXT RUNG';
+  const label = workoutType==='max'?'REST ??NEXT SET':'volume'===workoutType?'REST ??NEXT SET':'REST ??NEXT RUNG';
   info.textContent = label;
   disp.className = 'timer-display ' + (workoutType==='ladder'?'pull':(workoutType==='max'?'dip':'pull'));
   updateGlobalTimerDisplay();
@@ -369,7 +369,7 @@ function skipTimer(){
   timerTarget=null;
 }
 
-// ── DATA HELPERS ──────────────────────────────────────────────────────────────
+// ?? DATA HELPERS ??????????????????????????????????????????????????????????????
 function dayState(weekData,dayId){if(!weekData[dayId])weekData[dayId]={};return weekData[dayId];}
 function dayTotal(weekData,dayId){
   const day=DAYS[dayId],ds=weekData[dayId]||{};
@@ -383,7 +383,7 @@ function weekTotals(weekData){
 }
 function getToday(){return(new Date().getDay()+6)%7;}
 
-// ── LOG VIEW ──────────────────────────────────────────────────────────────────
+// ?? LOG VIEW ??????????????????????????????????????????????????????????????????
 let activeDay=Math.min(getToday(),5);
 
 function renderTabs(){
@@ -392,7 +392,7 @@ function renderTabs(){
   DAYS.forEach(day=>{
     const b=document.createElement('button');
     b.className=`day-tab ${day.type}${day.id===activeDay?' active':''}`;
-    b.innerHTML=`<span class="dot"></span>${day.name}${day.id===today?' ●':''}`;
+    b.innerHTML=`<span class="dot"></span>${day.name}${day.id===today?' *':''}`;
     b.ontouchend=()=>{activeDay=day.id;renderLog();};
     c.appendChild(b);
   });
@@ -405,7 +405,7 @@ function renderStdSets(day,ds,type){
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="setRepValue(${day.id},${s},this,true)"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})">✓</button></div></div></div>`;
+    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})">✓</button></div></div></div>`;
   }
   return h;
 }
@@ -418,8 +418,8 @@ function renderLadderSets(day,ds,type){
     let rh='';
     rungs.forEach((r,ri)=>{
       const sc=r.failed?'failed':(r.done?`done ${type}`:'');
-      const ic=r.failed?'✕':(r.done?'✓':'○');
-      rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}×)</div><button class="rung-toggle ${sc}" onclick="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchend="failRung(${day.id},${s},${ri})">✕</button></div>`;
+      const ic=r.failed?'x':(r.done?'v':'o');
+      rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}x)</div><button class="rung-toggle ${sc}" onclick="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchend="failRung(${day.id},${s},${ri})">x</button></div>`;
     });
     h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS</div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" onclick="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
   }
@@ -504,7 +504,7 @@ function failRung(dayId,si,ri){
 }
 function resetWeek(){if(!confirm('Reset all data for this week?'))return;history[CURRENT_WEEK]={};state=history[CURRENT_WEEK];saveHistory(history);renderLog();}
 
-// ── ADD PAST VIEW ─────────────────────────────────────────────────────────────
+// ?? ADD PAST VIEW ?????????????????????????????????????????????????????????????
 let pastWeekKey = null;   // currently selected past week key
 let pastActiveDay = 0;    // currently selected day in past entry
 // Transient state for the past entry form (per day)
@@ -530,7 +530,7 @@ function onPastDateChange(){
   // Don't allow editing current week here
   if(pastWeekKey === CURRENT_WEEK){
     document.getElementById('pastWeekResolved').innerHTML =
-      `<span style="color:#ff6b35">THAT'S THE CURRENT WEEK — USE THE LOG TAB</span>`;
+      `<span style="color:#ff6b35">THAT'S THE CURRENT WEEK ??USE THE LOG TAB</span>`;
     document.getElementById('pastDayTabs').innerHTML='';
     document.getElementById('pastSetsArea').innerHTML='';
     return;
@@ -584,7 +584,7 @@ function renderPastSets(){
         rh+=`<div class="ladder-entry-row">
           <div class="le-label">RUNG ${ri+1} (${ri+1} REP${ri+1>1?'S':''})</div>
           <input type="number" min="0" value="${r.reps||ri+1}" readonly style="opacity:0.5;width:60px;flex:none;">
-          <button class="le-remove" ontouchend="pastRemoveRung(${s},${ri})">✕</button>
+          <button class="le-remove" ontouchend="pastRemoveRung(${s},${ri})">??/button>
         </div>`;
       });
       const setTot = rungs.reduce((a,r)=>a+r.reps,0);
@@ -613,7 +613,7 @@ function renderPastSets(){
           <div class="rep-input-row">
             <div class="rep-label">REPS</div>
             <div class="rep-controls">
-              <button class="rep-btn" ontouchend="pastChRep(${s},-1)">−</button>
+              <button class="rep-btn" ontouchend="pastChRep(${s},-1)">??/button>
               <input class="rep-value-input ${cc}" id="past_rep_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setPastRepValue(${s},this,false)" onchange="setPastRepValue(${s},this,true)" onblur="setPastRepValue(${s},this,true)">
               <button class="rep-btn" ontouchend="pastChRep(${s},1)">+</button>
             </div>
@@ -627,7 +627,7 @@ function renderPastSets(){
 }
 
 function saveBtnHtml(type){
-  return `<button class="save-past-btn ${type}" ontouchend="savePastDay()" style="margin-top:14px">SAVE THIS DAY ›</button>
+  return `<button class="save-past-btn ${type}" ontouchend="savePastDay()" style="margin-top:14px">SAVE THIS DAY ??/button>
           <div class="save-toast" id="saveToast"></div>`;
 }
 
@@ -674,12 +674,12 @@ function savePastDay(){
   history[pastWeekKey][pastActiveDay] = JSON.parse(JSON.stringify(pastFormData[pastWeekKey][pastActiveDay]));
   saveHistory(history);
   const toast=document.getElementById('saveToast');
-  toast.textContent=`✓ ${DAYS[pastActiveDay].label} SAVED`;
+  toast.textContent=`??${DAYS[pastActiveDay].label} SAVED`;
   toast.className='save-toast show';
   setTimeout(()=>toast.className='save-toast',2000);
 }
 
-// ── PROGRESS VIEW ─────────────────────────────────────────────────────────────
+// ?? PROGRESS VIEW ?????????????????????????????????????????????????????????????
 let progressType='pull',chartWeekly=null,chartDay=null;
 function setProgressType(t){progressType=t;renderProgress();}
 function toggleHistWeek(el){el.nextElementSibling.classList.toggle('open');}
@@ -695,7 +695,7 @@ function renderProgress(){
   const typeDays=DAYS.filter(d=>d.type===type);
   const palette=['#f0f0f0','#cccccc','#aaaaaa'];
   const dayDatasets=typeDays.map((day,i)=>({
-    label: WORKOUT_LABELS[day.workout].split(' — ')[0],
+    label: WORKOUT_LABELS[day.workout].split(' ??')[0],
     data:weeks.map(wk=>dayTotal(history[wk]||{},day.id)),
     borderColor:palette[i%palette.length],
     backgroundColor:'transparent',
@@ -705,7 +705,7 @@ function renderProgress(){
   }));
 
   let histHtml='';
-  if(weeks.length===0){histHtml='<div class="no-data">NO DATA YET — START LOGGING!</div>';}
+  if(weeks.length===0){histHtml='<div class="no-data">NO DATA YET ??START LOGGING!</div>';}
   else{
     [...weeks].reverse().forEach(wk=>{
       const wd=history[wk]||{},wt=weekTotals(wd),tot=type==='pull'?wt.pull:wt.dip,isCur=wk===CURRENT_WEEK;
@@ -764,7 +764,7 @@ function renderProgress(){
   });
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+// ?? INIT ??????????????????????????????????????????????????????????????????????
 renderLog();
 </script>
 
@@ -777,3 +777,5 @@ renderLog();
 
 </body>
 </html>
+
+
