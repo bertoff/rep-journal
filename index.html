@@ -254,9 +254,9 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.02.3';
+const APP_VERSION='2026.04.03.1';
 const WORKOUT_LABELS={max:'MAX DAY — 3 × MAX REPS',volume:'SUB MAX VOLUME - 10 × VOLUME SETS',ladder:'LADDER VOLUME - 5 × LADDER SETS'};
-const BUILD_VERSION='v4';
+const BUILD_VERSION='v5';
 
 // ── STORAGE ──────────────────────────────────────────────────────────────────
 function mondayStr(d=new Date()){
@@ -397,7 +397,7 @@ function renderStdSets(day,ds,type){
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" ontouchend="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})">✓</button></div></div></div>`;
+    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" ontouchend="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})">✓</button></div></div></div>`;
   }
   return h;
 }
@@ -411,9 +411,9 @@ function renderLadderSets(day,ds,type){
     rungs.forEach((r,ri)=>{
       const sc=r.failed?'failed':(r.done?`done ${type}`:'');
       const ic=r.failed?'✕':(r.done?'✓':'○');
-      rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}×)</div><button class="rung-toggle ${sc}" ontouchend="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchend="failRung(${day.id},${s},${ri})">✕</button></div>`;
+      rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}×)</div><button class="rung-toggle ${sc}" onclick="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchend="failRung(${day.id},${s},${ri})">✕</button></div>`;
     });
-    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS</div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" ontouchend="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
+    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS</div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" onclick="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
   }
   return h;
 }
@@ -438,10 +438,12 @@ function renderLog(){
     </div>`;
   const today=getToday();
   document.getElementById('todayLabel').textContent=today<6?DAYS[today].name:'REST';
-  document.getElementById('versionBadge').textContent='BUILD ' + APP_VERSION;
+  const versionBadge = document.getElementById('versionBadge');
+  if(versionBadge) versionBadge.textContent='BUILD ' + APP_VERSION;
   const weekNum = getWeekNumber(mondayDate(CURRENT_WEEK));
   document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(CURRENT_WEEK) + ')';
-  document.getElementById('buildLabel').textContent = 'BUILD ' + BUILD_VERSION;
+  const buildLabel = document.getElementById('buildLabel');
+  if(buildLabel) buildLabel.textContent = 'BUILD ' + BUILD_VERSION;
 }
 
 function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);if(ds[k]===0)ds[`${k}_done`]=false;persist();renderLog();}
@@ -757,7 +759,7 @@ renderLog();
 <div class="timer-panel" id="timerPanel">
   <div class="timer-info" id="timerInfo">REST</div>
   <div class="timer-display" id="timerDisplay">00:00</div>
-  <button class="timer-skip" ontouchend="skipTimer()">SKIP</button>
+  <button class="timer-skip" onclick="skipTimer()">SKIP</button>
 </div>
 
 </body>
