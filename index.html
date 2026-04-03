@@ -205,9 +205,9 @@
 <header>
   <div>
     <h1>REP JOURNAL</h1>
-    <div class="week-label" id="weekLabel">??/div>
-    <div class="version-badge" id="versionBadge">BUILD ??/div>
-    <div class="build-label" id="buildLabel">BUILD ??/div>
+    <div class="week-label" id="weekLabel">-</div>
+    <div class="version-badge" id="versionBadge">BUILD -</div>
+    <div class="build-label" id="buildLabel">BUILD -</div>
   </div>
   <div style="text-align:right">
     <div style="font-size:.53rem;color:var(--muted2);letter-spacing:2px">TODAY</div>
@@ -217,9 +217,9 @@
 </header>
 
 <div class="nav-bar">
-  <button class="nav-btn active" id="navLog"      ontouchend="switchView('log')">LOG</button>
-  <button class="nav-btn"        id="navPast"     ontouchend="switchView('past')">HISTORY</button>
-  <button class="nav-btn"        id="navProgress" ontouchend="switchView('progress')">PROGRESS</button>
+  <button class="nav-btn active" id="navLog"      ontouchend="switchView('log')" onclick="switchView('log')">LOG</button>
+  <button class="nav-btn"        id="navPast"     ontouchend="switchView('past')" onclick="switchView('past')">HISTORY</button>
+  <button class="nav-btn"        id="navProgress" ontouchend="switchView('progress')" onclick="switchView('progress')">PROGRESS</button>
 </div>
 
 <!-- LOG VIEW -->
@@ -237,12 +237,12 @@
     <div class="week-picker-card">
       <label>PICK ANY DATE IN THAT WEEK</label>
       <input type="date" id="pastDateInput" onchange="onPastDateChange()">
-      <div class="week-resolved" id="pastWeekResolved">??SELECT A DATE ABOVE ??/div>
+      <div class="week-resolved" id="pastWeekResolved">- SELECT A DATE ABOVE -</div>
     </div>
 
     <div class="past-day-tabs" id="pastDayTabs"></div>
     <div id="pastSetsArea"></div>
-    <div class="save-toast" id="saveToast">??SAVED</div>
+    <div class="save-toast" id="saveToast">SAVED</div>
   </div>
 </div>
 
@@ -262,9 +262,9 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.03.8';
+const APP_VERSION='2026.04.03.10';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
-const BUILD_VERSION='v12';
+const BUILD_VERSION='v14';
 
 // ?? STORAGE ??????????????????????????????????????????????????????????????????
 function mondayStr(d=new Date()){
@@ -335,7 +335,7 @@ function startTimer(workoutType, dayId, setIdx, duration){
   const info = document.getElementById('timerInfo');
   const disp = document.getElementById('timerDisplay');
   
-  const label = workoutType==='max'?'REST ??NEXT SET':'volume'===workoutType?'REST ??NEXT SET':'REST ??NEXT RUNG';
+  const label = workoutType==='max'?'REST - NEXT SET':'volume'===workoutType?'REST - NEXT SET':'REST - NEXT RUNG';
   info.textContent = label;
   disp.className = 'timer-display ' + (workoutType==='ladder'?'pull':(workoutType==='max'?'dip':'pull'));
   updateGlobalTimerDisplay();
@@ -530,7 +530,7 @@ function onPastDateChange(){
   // Don't allow editing current week here
   if(pastWeekKey === CURRENT_WEEK){
     document.getElementById('pastWeekResolved').innerHTML =
-      `<span style="color:#ff6b35">THAT'S THE CURRENT WEEK ??USE THE LOG TAB</span>`;
+      `<span style="color:#ff6b35">THAT'S THE CURRENT WEEK - USE THE LOG TAB</span>`;
     document.getElementById('pastDayTabs').innerHTML='';
     document.getElementById('pastSetsArea').innerHTML='';
     return;
@@ -584,7 +584,7 @@ function renderPastSets(){
         rh+=`<div class="ladder-entry-row">
           <div class="le-label">RUNG ${ri+1} (${ri+1} REP${ri+1>1?'S':''})</div>
           <input type="number" min="0" value="${r.reps||ri+1}" readonly style="opacity:0.5;width:60px;flex:none;">
-          <button class="le-remove" ontouchend="pastRemoveRung(${s},${ri})">??/button>
+          <button class="le-remove" ontouchend="pastRemoveRung(${s},${ri})">x</button>
         </div>`;
       });
       const setTot = rungs.reduce((a,r)=>a+r.reps,0);
@@ -613,7 +613,7 @@ function renderPastSets(){
           <div class="rep-input-row">
             <div class="rep-label">REPS</div>
             <div class="rep-controls">
-              <button class="rep-btn" ontouchend="pastChRep(${s},-1)">??/button>
+              <button class="rep-btn" ontouchend="pastChRep(${s},-1)">-</button>
               <input class="rep-value-input ${cc}" id="past_rep_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setPastRepValue(${s},this,false)" onchange="setPastRepValue(${s},this,true)" onblur="setPastRepValue(${s},this,true)">
               <button class="rep-btn" ontouchend="pastChRep(${s},1)">+</button>
             </div>
@@ -627,7 +627,7 @@ function renderPastSets(){
 }
 
 function saveBtnHtml(type){
-  return `<button class="save-past-btn ${type}" ontouchend="savePastDay()" style="margin-top:14px">SAVE THIS DAY ??/button>
+  return `<button class="save-past-btn ${type}" ontouchend="savePastDay()" style="margin-top:14px">SAVE THIS DAY ></button>
           <div class="save-toast" id="saveToast"></div>`;
 }
 
@@ -674,7 +674,7 @@ function savePastDay(){
   history[pastWeekKey][pastActiveDay] = JSON.parse(JSON.stringify(pastFormData[pastWeekKey][pastActiveDay]));
   saveHistory(history);
   const toast=document.getElementById('saveToast');
-  toast.textContent=`??${DAYS[pastActiveDay].label} SAVED`;
+  toast.textContent=`SAVED ${DAYS[pastActiveDay].label}`;
   toast.className='save-toast show';
   setTimeout(()=>toast.className='save-toast',2000);
 }
@@ -695,7 +695,7 @@ function renderProgress(){
   const typeDays=DAYS.filter(d=>d.type===type);
   const palette=['#f0f0f0','#cccccc','#aaaaaa'];
   const dayDatasets=typeDays.map((day,i)=>({
-    label: WORKOUT_LABELS[day.workout].split(' ??')[0],
+    label: WORKOUT_LABELS[day.workout].split(' - ')[0],
     data:weeks.map(wk=>dayTotal(history[wk]||{},day.id)),
     borderColor:palette[i%palette.length],
     backgroundColor:'transparent',
@@ -705,7 +705,7 @@ function renderProgress(){
   }));
 
   let histHtml='';
-  if(weeks.length===0){histHtml='<div class="no-data">NO DATA YET ??START LOGGING!</div>';}
+  if(weeks.length===0){histHtml='<div class="no-data">NO DATA YET - START LOGGING!</div>';}
   else{
     [...weeks].reverse().forEach(wk=>{
       const wd=history[wk]||{},wt=weekTotals(wd),tot=type==='pull'?wt.pull:wt.dip,isCur=wk===CURRENT_WEEK;
