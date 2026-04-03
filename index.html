@@ -204,6 +204,8 @@
   <div style="text-align:right">
     <div style="font-size:.53rem;color:var(--muted2);letter-spacing:2px">TODAY</div>
     <div id="todayLabel"></div>
+    <div class="version-badge" id="versionBadge">BUILD —</div>
+    <div class="build-label" id="buildLabel">BUILD —</div>
     <button class="reset-btn" ontouchend="resetWeek()" style="font-size:0.5rem;margin-top:4px;">RESET WEEK</button>
   </div>
 </header>
@@ -254,9 +256,9 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.03.4';
+const APP_VERSION='2026.04.03.5';
 const WORKOUT_LABELS={max:'MAX DAY — 3 × MAX REPS',volume:'SUB MAX VOLUME - 10 × VOLUME SETS',ladder:'LADDER VOLUME - 5 × LADDER SETS'};
-const BUILD_VERSION='v8';
+const BUILD_VERSION='v9';
 
 // ── STORAGE ──────────────────────────────────────────────────────────────────
 function mondayStr(d=new Date()){
