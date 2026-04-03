@@ -21,6 +21,7 @@
   .week-label{font-size:0.56rem;color:var(--muted2);letter-spacing:2px;}
   .build-label{font-size:0.5rem;color:var(--muted2);letter-spacing:2px;margin-top:3px;}
   #todayLabel{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;}
+  .version-badge{margin-top:3px;font-size:0.5rem;color:var(--muted2);letter-spacing:1px;}
 
   /* NAV */
   .nav-bar{display:flex;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:62px;z-index:99;}
@@ -71,11 +72,7 @@
   .done-btn:active{background:var(--border);}
   .rep-prev{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--muted);padding:4px 0;min-width:56px;}
   .done-btn{width:100%;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:1px;line-height:1;}
-  .set-card.set-done{opacity:1;}
-  .set-card.set-done.pull{border-color:var(--pull);box-shadow:0 0 0 1px rgba(178,216,178,.18), inset 0 0 0 1px rgba(178,216,178,.06);}
-  .set-card.set-done.dip{border-color:var(--dip);box-shadow:0 0 0 1px rgba(240,240,240,.16), inset 0 0 0 1px rgba(240,240,240,.05);}
-  .set-card.set-done .set-header,
-  .set-card.set-done .set-body{border-color:inherit;}
+  .set-done{opacity:0.85;border-color:var(--pull);box-shadow:0 0 0 1px rgba(200,245,90,0.2);}
   .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
   .rep-value.pull{color:var(--pull);}
   .rep-value.dip {color:var(--dip);}
@@ -194,6 +191,7 @@
   .timer-display.pull{color:var(--pull);}
   .timer-display.dip{color:var(--dip);}
   .timer-skip{padding:8px 16px;border:1px solid var(--border);background:var(--surface2);color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;pointer-events:auto;}
+
 </style>
 </head>
 <body>
@@ -202,11 +200,11 @@
   <div>
     <h1>REP JOURNAL</h1>
     <div class="week-label" id="weekLabel">—</div>
-    <div class="build-label" id="buildLabel">BUILD v4</div>
   </div>
   <div style="text-align:right">
     <div style="font-size:.53rem;color:var(--muted2);letter-spacing:2px">TODAY</div>
     <div id="todayLabel"></div>
+    <button class="reset-btn" ontouchend="resetWeek()" style="font-size:0.5rem;margin-top:4px;">RESET WEEK</button>
   </div>
 </header>
 
@@ -256,6 +254,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
+const APP_VERSION='2026.04.02.3';
 const WORKOUT_LABELS={max:'MAX DAY — 3 × MAX REPS',volume:'SUB MAX VOLUME - 10 × VOLUME SETS',ladder:'LADDER VOLUME - 5 × LADDER SETS'};
 const BUILD_VERSION='v4';
 
@@ -316,10 +315,12 @@ function switchView(v){
 }
 
 // ── TIMER ─────────────────────────────────────────────────────────────────────
-let timerInt=null,timerSecs=0,timerTarget=null;
+let timerInt=null, timerSecs=0, timerTarget=null, timerEnd=0;
 function startTimer(workoutType, dayId, setIdx, duration){
   const defaultDur = workoutType==='max'?300:workoutType==='volume'?60:workoutType==='ladder'?30:30;
-  timerSecs = Number.isFinite(duration)?duration:defaultDur;
+  const initialSecs = Number.isFinite(duration)?duration:defaultDur;
+  timerSecs = initialSecs;
+  timerEnd = Date.now() + initialSecs * 1000;
   timerTarget = `setTimer_${dayId}_${setIdx}`;
   
   const panel = document.getElementById('timerPanel');
@@ -334,37 +335,29 @@ function startTimer(workoutType, dayId, setIdx, duration){
   document.body.classList.add('timer-active');
   
   clearInterval(timerInt);
-  timerInt=setInterval(()=>{timerSecs--;updateGlobalTimerDisplay();if(timerSecs<=0)skipTimer();},1000);
+  timerInt = setInterval(()=>{
+    const remainingMs = timerEnd - Date.now();
+    timerSecs = Math.max(0, Math.ceil(remainingMs / 1000));
+    updateGlobalTimerDisplay();
+    if(remainingMs <= 0) skipTimer();
+  }, 250);
 }
 function updateGlobalTimerDisplay(){
+  if(timerEnd>0){
+    const remainingMs = timerEnd - Date.now();
+    timerSecs = Math.max(0, Math.ceil(remainingMs / 1000));
+  }
   const disp = document.getElementById('timerDisplay');
   const mm = String(Math.floor(timerSecs/60)).padStart(2,'0');
   const ss = String(timerSecs%60).padStart(2,'0');
   disp.textContent = `${mm}:${ss}`;
 }
-function updateTimerDisplay(){
-  if(!timerTarget) return;
-  const el=document.getElementById(timerTarget);
-  if(!el) return;
-  if(timerSecs>0){
-    const mm=String(Math.floor(timerSecs/60)).padStart(2,'0');
-    const ss=String(timerSecs%60).padStart(2,'0');
-    el.textContent=`${mm}:${ss}`;
-    el.classList.add('active');
-  } else {
-    el.textContent='';
-    el.classList.remove('active');
-  }
-}
 function skipTimer(){
   clearInterval(timerInt);
+  timerEnd = 0;
   const panel = document.getElementById('timerPanel');
   panel.classList.remove('active');
   document.body.classList.remove('timer-active');
-  if(timerTarget){
-    const el=document.getElementById(timerTarget);
-    if(el){el.textContent='';el.classList.remove('active');}
-  }
   timerTarget=null;
 }
 
@@ -404,7 +397,7 @@ function renderStdSets(day,ds,type){
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done '+type:''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" ontouchend="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})">✓</button></div></div></div>`;
+    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" ontouchend="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})">✓</button></div></div></div>`;
   }
   return h;
 }
@@ -420,7 +413,7 @@ function renderLadderSets(day,ds,type){
       const ic=r.failed?'✕':(r.done?'✓':'○');
       rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}×)</div><button class="rung-toggle ${sc}" ontouchend="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchend="failRung(${day.id},${s},${ri})">✕</button></div>`;
     });
-    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS<span class="set-timer" id="setTimer_${day.id}_${s}"></span></div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" ontouchend="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
+    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS</div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" ontouchend="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
   }
   return h;
 }
@@ -442,17 +435,40 @@ function renderLog(){
         <div class="week-stat"><div class="label">PULL UPS</div><div class="val pull">${wt.pull}</div></div>
         <div class="week-stat"><div class="label">DIPS</div><div class="val dip">${wt.dip}</div></div>
       </div>
-      <button class="reset-btn" ontouchend="resetWeek()">RESET THIS WEEK</button>
     </div>`;
   const today=getToday();
   document.getElementById('todayLabel').textContent=today<6?DAYS[today].name:'REST';
+  document.getElementById('versionBadge').textContent='BUILD ' + APP_VERSION;
   const weekNum = getWeekNumber(mondayDate(CURRENT_WEEK));
   document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(CURRENT_WEEK) + ')';
   document.getElementById('buildLabel').textContent = 'BUILD ' + BUILD_VERSION;
 }
 
-function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);persist();renderLog();}
-function promptRep(dayId,si){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:'';const v=prompt(`Reps for Set ${si+1}:`,current);if(v!==null&&!isNaN(parseInt(v))){ds[k]=Math.max(0,parseInt(v));persist();renderLog();}}
+function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);if(ds[k]===0)ds[`${k}_done`]=false;persist();renderLog();}
+function parseRepValue(value){
+  const digits=String(value??'').replace(/\D/g,'');
+  if(!digits) return 0;
+  return Math.max(0,parseInt(digits,10) || 0);
+}
+function normalizeRepInput(input){
+  let digits=String(input.value??'').replace(/\D/g,'');
+  if(digits.length>1) digits=digits.replace(/^0+/,'') || '0';
+  if(input.value!==digits) input.value=digits;
+  return digits;
+}
+function setRepValue(dayId,si,input,rerender){
+  const ds=dayState(state,dayId),k=`set_${si}`;
+  ds[k]=parseRepValue(normalizeRepInput(input));
+  if(ds[k]===0)ds[`${k}_done`]=false;
+  persist();
+  if(rerender) renderLog();
+}
+function promptRep(dayId,si){
+  const input=document.querySelector(`[data-rep-input="${dayId}_${si}"]`);
+  if(!input) return;
+  input.focus();
+  input.select();
+}
 function completeSet(dayId,si){
   const day=DAYS[dayId];
   const ds=dayState(state,dayId);
@@ -465,7 +481,12 @@ function completeSet(dayId,si){
   renderLog();
 }
 function addRung(dayId,si,type){const ds=dayState(state,dayId),k=`set_${si}`;if(!ds[k])ds[k]=[];const rungs=ds[k];rungs.push({reps:rungs.length+1,done:false,failed:false});persist();renderLog();startTimer('ladder',dayId,si,30);}function toggleRung(dayId,si,ri){const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];if(rungs[ri]&&!rungs[ri].failed){rungs[ri].done=!rungs[ri].done;if(rungs[ri].done)startTimer('ladder',dayId,si,30);}persist();renderLog();}
-function failRung(dayId,si,ri){const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];if(rungs[ri]){rungs[ri].failed=!rungs[ri].failed;rungs[ri].done=false;}persist();renderLog();}
+function failRung(dayId,si,ri){
+  const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];
+  if(rungs[ri]) rungs.splice(ri,1);
+  persist();
+  renderLog();
+}
 function resetWeek(){if(!confirm('Reset all data for this week?'))return;history[CURRENT_WEEK]={};state=history[CURRENT_WEEK];saveHistory(history);renderLog();}
 
 // ── ADD PAST VIEW ─────────────────────────────────────────────────────────────
@@ -578,7 +599,7 @@ function renderPastSets(){
             <div class="rep-label">REPS</div>
             <div class="rep-controls">
               <button class="rep-btn" ontouchend="pastChRep(${s},-1)">−</button>
-              <div class="rep-value ${cc}" id="past_rep_${s}" ontouchend="pastPromptRep(${s})">${val}</div>
+              <input class="rep-value-input ${cc}" id="past_rep_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setPastRepValue(${s},this,false)" onchange="setPastRepValue(${s},this,true)" onblur="setPastRepValue(${s},this,true)">
               <button class="rep-btn" ontouchend="pastChRep(${s},1)">+</button>
             </div>
           </div>
@@ -602,12 +623,18 @@ function pastChRep(si,delta){
   fd[k]=Math.max(0,(fd[k]||0)+delta);
   renderPastSets();
 }
-function pastPromptRep(si){
+function setPastRepValue(si,input,rerender){
   if(!pastWeekKey) return;
   const fd=pastFormData[pastWeekKey][pastActiveDay];
   const k=`set_${si}`;
-  const v=prompt(`Reps for Set ${si+1}:`,fd[k]||'');
-  if(v!==null&&!isNaN(parseInt(v))){fd[k]=Math.max(0,parseInt(v));renderPastSets();}
+  fd[k]=parseRepValue(normalizeRepInput(input));
+  if(rerender) renderPastSets();
+}
+function pastPromptRep(si){
+  const input=document.getElementById(`past_rep_${si}`);
+  if(!input) return;
+  input.focus();
+  input.select();
 }
 function pastAddRung(si){
   if(!pastWeekKey) return;
@@ -653,7 +680,7 @@ function renderProgress(){
   const typeDays=DAYS.filter(d=>d.type===type);
   const palette=['#f0f0f0','#cccccc','#aaaaaa'];
   const dayDatasets=typeDays.map((day,i)=>({
-    label:day.name,
+    label: WORKOUT_LABELS[day.workout].split(' — ')[0],
     data:weeks.map(wk=>dayTotal(history[wk]||{},day.id)),
     borderColor:palette[i%palette.length],
     backgroundColor:'transparent',
