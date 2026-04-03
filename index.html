@@ -19,6 +19,7 @@
   header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;}
   h1{font-family:'Bebas Neue',sans-serif;font-size:2.1rem;letter-spacing:5px;line-height:1;}
   .week-label{font-size:0.56rem;color:var(--muted2);letter-spacing:2px;}
+  .build-label{font-size:0.5rem;color:var(--muted2);letter-spacing:2px;margin-top:3px;}
   #todayLabel{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;}
 
   /* NAV */
@@ -70,7 +71,11 @@
   .done-btn:active{background:var(--border);}
   .rep-prev{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--muted);padding:4px 0;min-width:56px;}
   .done-btn{width:100%;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:1px;line-height:1;}
-  .set-done{opacity:0.85;border-color:var(--pull);box-shadow:0 0 0 1px rgba(200,245,90,0.2);}
+  .set-card.set-done{opacity:1;}
+  .set-card.set-done.pull{border-color:var(--pull);box-shadow:0 0 0 1px rgba(178,216,178,.18), inset 0 0 0 1px rgba(178,216,178,.06);}
+  .set-card.set-done.dip{border-color:var(--dip);box-shadow:0 0 0 1px rgba(240,240,240,.16), inset 0 0 0 1px rgba(240,240,240,.05);}
+  .set-card.set-done .set-header,
+  .set-card.set-done .set-body{border-color:inherit;}
   .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
   .rep-value.pull{color:var(--pull);}
   .rep-value.dip {color:var(--dip);}
@@ -197,6 +202,7 @@
   <div>
     <h1>REP JOURNAL</h1>
     <div class="week-label" id="weekLabel">—</div>
+    <div class="build-label" id="buildLabel">BUILD v4</div>
   </div>
   <div style="text-align:right">
     <div style="font-size:.53rem;color:var(--muted2);letter-spacing:2px">TODAY</div>
@@ -251,6 +257,7 @@ const DAYS = [
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
 const WORKOUT_LABELS={max:'MAX DAY — 3 × MAX REPS',volume:'SUB MAX VOLUME - 10 × VOLUME SETS',ladder:'LADDER VOLUME - 5 × LADDER SETS'};
+const BUILD_VERSION='v4';
 
 // ── STORAGE ──────────────────────────────────────────────────────────────────
 function mondayStr(d=new Date()){
@@ -397,7 +404,7 @@ function renderStdSets(day,ds,type){
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" ontouchend="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})">✓</button></div></div></div>`;
+    h+=`<div class="set-card${done?' set-done '+type:''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><div class="rep-value ${cc}" ontouchend="promptRep(${day.id},${s})">${val}</div><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})">✓</button></div></div></div>`;
   }
   return h;
 }
@@ -441,6 +448,7 @@ function renderLog(){
   document.getElementById('todayLabel').textContent=today<6?DAYS[today].name:'REST';
   const weekNum = getWeekNumber(mondayDate(CURRENT_WEEK));
   document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(CURRENT_WEEK) + ')';
+  document.getElementById('buildLabel').textContent = 'BUILD ' + BUILD_VERSION;
 }
 
 function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);persist();renderLog();}
