@@ -263,7 +263,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.15';
+const APP_VERSION='2026.04.10.16';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -643,10 +643,14 @@ function renderProgress(){
   const workoutColorMap={max:'#ff8a65',volume:'#4fc3f7',ladder:'#ffd54f'};
   const dayDatasets=typeDays.map((day,i)=>({
     label: WORKOUT_LABELS[day.workout].split(' - ')[0],
-    data:weeks.map(wk=>dayTotal(history[wk]||{},day.id)),
+    data:weeks.map(wk=>{
+      const reps=dayTotal(history[wk]||{},day.id);
+      return reps>0?reps:null;
+    }),
     borderColor:workoutColorMap[day.workout],
     backgroundColor:'transparent',
-    tension:0.35,pointRadius:4,
+    tension:0,pointRadius:4,
+    spanGaps:false,
     pointBackgroundColor:workoutColorMap[day.workout],
     borderWidth:2,
   }));
