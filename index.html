@@ -116,7 +116,8 @@
   .week-picker-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;}
   .week-picker-card label{display:block;font-size:0.56rem;color:var(--muted2);letter-spacing:2px;margin-bottom:8px;}
   .week-picker-card input[type=date]{
-    width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+    width:100%;max-width:100%;display:block;min-width:0;
+    background:var(--surface2);border:1px solid var(--border);border-radius:6px;
     color:var(--text);font-family:'DM Mono',monospace;font-size:0.75rem;padding:9px 12px;
     letter-spacing:1px;outline:none;
   }
@@ -218,7 +219,6 @@
 
 <div class="nav-bar">
   <button class="nav-btn active" id="navLog"      ontouchend="switchView('log')" onclick="switchView('log')">LOG</button>
-  <button class="nav-btn"        id="navPast"     ontouchend="switchView('past')" onclick="switchView('past')">HISTORY</button>
   <button class="nav-btn"        id="navProgress" ontouchend="switchView('progress')" onclick="switchView('progress')">PROGRESS</button>
 </div>
 
@@ -233,24 +233,6 @@
   </div>
   <div class="day-tabs" id="dayTabs"></div>
   <div class="content"  id="content"></div>
-</div>
-
-<!-- HISTORY VIEW -->
-<div id="viewPast" style="display:none">
-  <div class="past-view">
-    <h2>HISTORY</h2>
-    <p>Pick any date within the week you want to log. Then select a day and enter your reps.</p>
-
-    <div class="week-picker-card">
-      <label>PICK ANY DATE IN THAT WEEK</label>
-      <input type="date" id="pastDateInput" onchange="onPastDateChange()">
-      <div class="week-resolved" id="pastWeekResolved">- SELECT A DATE ABOVE -</div>
-    </div>
-
-    <div class="past-day-tabs" id="pastDayTabs"></div>
-    <div id="pastSetsArea"></div>
-    <div class="save-toast" id="saveToast">SAVED</div>
-  </div>
 </div>
 
 <!-- PROGRESS VIEW -->
@@ -269,7 +251,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.1';
+const APP_VERSION='2026.04.10.2';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const BUILD_VERSION='v14';
 
@@ -345,12 +327,11 @@ function onLogWeekDateChange(){
 let currentView='log';
 function switchView(v){
   currentView=v;
-  ['log','past','progress'].forEach(n=>{
+  ['log','progress'].forEach(n=>{
     document.getElementById('view'+n.charAt(0).toUpperCase()+n.slice(1)).style.display=v===n?'':'none';
     document.getElementById('nav'+n.charAt(0).toUpperCase()+n.slice(1)).classList.toggle('active',v===n);
   });
   if(v==='progress') renderProgress();
-  if(v==='past') initPastView();
 }
 
 // ?? TIMER ?????????????????????????????????????????????????????????????????????
@@ -548,181 +529,6 @@ function resetWeek(){
   state=history[selectedWeekKey];
   saveHistory(history);
   renderLog();
-}
-
-// ?? ADD PAST VIEW ?????????????????????????????????????????????????????????????
-let pastWeekKey = null;   // currently selected past week key
-let pastActiveDay = 0;    // currently selected day in past entry
-// Transient state for the past entry form (per day)
-// pastFormData[weekKey][dayId][setIdx] = reps  (for std/volume)
-// pastFormData[weekKey][dayId][setIdx] = [{reps}] (for ladder)
-let pastFormData = {};
-
-function initPastView(){
-  // Set default date to 7 days ago
-  const def = new Date(); def.setDate(def.getDate()-7);
-  const inp = document.getElementById('pastDateInput');
-  if(!inp.value){
-    inp.value = def.toISOString().split('T')[0];
-    onPastDateChange();
-  }
-}
-
-function onPastDateChange(){
-  const inp = document.getElementById('pastDateInput');
-  if(!inp.value) return;
-  const chosen = new Date(inp.value + 'T00:00:00');
-  pastWeekKey = mondayStr(chosen);
-  // Don't allow editing the active logging week from this screen
-  if(pastWeekKey === selectedWeekKey){
-    document.getElementById('pastWeekResolved').innerHTML =
-    `<span style="color:#ff6b35">THAT'S YOUR ACTIVE LOGGING WEEK - USE THE LOG TAB</span>`;
-    document.getElementById('pastDayTabs').innerHTML='';
-    document.getElementById('pastSetsArea').innerHTML='';
-    return;
-  }
-  document.getElementById('pastWeekResolved').innerHTML =
-    `WEEK OF <span>${fmtWeek(pastWeekKey)}</span>`;
-  // Pre-load existing history into form data if present
-  if(!pastFormData[pastWeekKey]){
-    pastFormData[pastWeekKey] = {};
-    // Copy existing saved data into form
-    const existing = history[pastWeekKey] || {};
-    DAYS.forEach(day=>{
-      pastFormData[pastWeekKey][day.id] = JSON.parse(JSON.stringify(existing[day.id]||{}));
-    });
-  }
-  pastActiveDay = 0;
-  renderPastDayTabs();
-  renderPastSets();
-}
-
-function renderPastDayTabs(){
-  const c=document.getElementById('pastDayTabs');
-  c.innerHTML='';
-  DAYS.forEach(day=>{
-    const b=document.createElement('button');
-    b.className=`past-day-tab ${day.type}${day.id===pastActiveDay?' active':''}`;
-    b.innerHTML=`<span class="dot"></span>${day.name}`;
-    b.ontouchend=()=>{pastActiveDay=day.id;renderPastDayTabs();renderPastSets();};
-    c.appendChild(b);
-  });
-}
-
-function renderPastSets(){
-  if(!pastWeekKey) return;
-  const day=DAYS[pastActiveDay];
-  const type=day.type;
-  const fd=pastFormData[pastWeekKey][pastActiveDay]||{};
-  const area=document.getElementById('pastSetsArea');
-
-  if(day.workout==='ladder'){
-    // Ladder: show sets, each set has a list of rungs with reps fields
-    let h=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;">
-      <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--muted2)">LADDER SETS</div>
-        <div style="font-size:0.55rem;color:var(--muted2);letter-spacing:1px;">ENTER MAX RUNG REACHED PER SET</div>
-      </div>`;
-    for(let s=0;s<day.sets;s++){
-      const rungs=fd[`set_${s}`]||[];
-      let rh='';
-      rungs.forEach((r,ri)=>{
-        rh+=`<div class="ladder-entry-row">
-          <div class="le-label">RUNG ${ri+1} (${ri+1} REP${ri+1>1?'S':''})</div>
-          <input type="number" min="0" value="${r.reps||ri+1}" readonly style="opacity:0.5;width:60px;flex:none;">
-          <button class="le-remove" ontouchend="pastRemoveRung(${s},${ri})">x</button>
-        </div>`;
-      });
-      const setTot = rungs.reduce((a,r)=>a+r.reps,0);
-      h+=`<div style="border-bottom:1px solid var(--border);padding-bottom:4px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px 4px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:2px;color:var(--muted2)">SET ${s+1}</div>
-          <div style="font-size:0.6rem;color:var(--muted2)"><span style="font-family:'Bebas Neue',sans-serif;font-size:0.9rem;color:var(--${type})">${setTot}</span> REPS</div>
-        </div>
-        ${rh}
-        <button class="add-ladder-rung-btn" ontouchend="pastAddRung(${s})">+ ADD RUNG (${rungs.length+1} REPS)</button>
-      </div>`;
-    }
-    h+=`</div>`;
-    area.innerHTML = h + saveBtnHtml(type);
-  } else {
-    // Max / Volume: simple +/- per set
-    let h='<div class="past-sets-area">';
-    for(let s=0;s<day.sets;s++){
-      const val=fd[`set_${s}`]||0,cc=val===0?'zero':type;
-      h+=`<div class="set-card">
-        <div class="set-header">
-          <div class="set-number">SET ${s+1}</div>
-          <div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div>
-        </div>
-        <div class="set-body">
-          <div class="rep-input-row">
-            <div class="rep-label">REPS</div>
-            <div class="rep-controls">
-              <button class="rep-btn" ontouchend="pastChRep(${s},-1)">-</button>
-              <input class="rep-value-input ${cc}" id="past_rep_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setPastRepValue(${s},this,false)" onchange="setPastRepValue(${s},this,true)" onblur="setPastRepValue(${s},this,true)">
-              <button class="rep-btn" ontouchend="pastChRep(${s},1)">+</button>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    }
-    h+='</div>';
-    area.innerHTML = h + saveBtnHtml(type);
-  }
-}
-
-function saveBtnHtml(type){
-  return `<button class="save-past-btn ${type}" ontouchend="savePastDay()" style="margin-top:14px">SAVE THIS DAY ></button>
-          <div class="save-toast" id="saveToast"></div>`;
-}
-
-function pastChRep(si,delta){
-  if(!pastWeekKey) return;
-  const fd=pastFormData[pastWeekKey][pastActiveDay];
-  const k=`set_${si}`;
-  fd[k]=Math.max(0,(fd[k]||0)+delta);
-  renderPastSets();
-}
-function setPastRepValue(si,input,rerender){
-  if(!pastWeekKey) return;
-  const fd=pastFormData[pastWeekKey][pastActiveDay];
-  const k=`set_${si}`;
-  fd[k]=parseRepValue(normalizeRepInput(input));
-  if(rerender) renderPastSets();
-}
-function pastPromptRep(si){
-  const input=document.getElementById(`past_rep_${si}`);
-  if(!input) return;
-  input.focus();
-  input.select();
-}
-function pastAddRung(si){
-  if(!pastWeekKey) return;
-  const fd=pastFormData[pastWeekKey][pastActiveDay];
-  const k=`set_${si}`;
-  if(!fd[k])fd[k]=[];
-  const rungs=fd[k];
-  rungs.push({reps:rungs.length+1,done:true,failed:false});
-  renderPastSets();
-}
-function pastRemoveRung(si,ri){
-  if(!pastWeekKey) return;
-  const fd=pastFormData[pastWeekKey][pastActiveDay];
-  const k=`set_${si}`;
-  if(fd[k])fd[k].splice(ri,1);
-  renderPastSets();
-}
-function savePastDay(){
-  if(!pastWeekKey) return;
-  if(!history[pastWeekKey]) history[pastWeekKey]={};
-  // Copy this day's form data into history
-  history[pastWeekKey][pastActiveDay] = JSON.parse(JSON.stringify(pastFormData[pastWeekKey][pastActiveDay]));
-  saveHistory(history);
-  const toast=document.getElementById('saveToast');
-  toast.textContent=`SAVED ${DAYS[pastActiveDay].label}`;
-  toast.className='save-toast show';
-  setTimeout(()=>toast.className='save-toast',2000);
 }
 
 // ?? PROGRESS VIEW ?????????????????????????????????????????????????????????????
