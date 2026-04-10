@@ -263,7 +263,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.14';
+const APP_VERSION='2026.04.10.15';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -298,13 +298,13 @@ function weekKeyFromNumber(weekNumber){
 function populateWeekSelect(selectedWeekNumber){
   const sel=document.getElementById('logWeekSelect');
   if(!sel) return;
-  const maxWeek=Math.max(selectedWeekNumber+8,getWeekNumber(mondayDate(REAL_CURRENT_WEEK))+8,12);
+  const maxWeek=getWeekNumber(mondayDate(REAL_CURRENT_WEEK));
   let html='';
   for(let w=1;w<=maxWeek;w++){
     html+=`<option value="${w}">WEEK ${w}</option>`;
   }
   sel.innerHTML=html;
-  sel.value=String(selectedWeekNumber);
+  sel.value=String(Math.min(selectedWeekNumber,maxWeek));
 }
 
 const HISTORY_KEY='repjournal_v3';
@@ -324,6 +324,7 @@ Object.keys(history).forEach(weekKey=>{
 });
 let selectedWeekKey = localStorage.getItem(WEEK_PREF_KEY) || REAL_CURRENT_WEEK;
 if(selectedWeekKey < PROGRAM_START_WEEK_KEY) selectedWeekKey = PROGRAM_START_WEEK_KEY;
+if(selectedWeekKey > REAL_CURRENT_WEEK) selectedWeekKey = REAL_CURRENT_WEEK;
 let state=history[selectedWeekKey]||{};
 function persist(){history[selectedWeekKey]=state;saveHistory(history);}
 saveHistory(history);
@@ -361,7 +362,7 @@ function setActiveDayForWeek(weekKey,dayId){
   saveActiveDayMap(activeDayByWeek);
 }
 function setSelectedWeek(weekKey){
-  selectedWeekKey = weekKey;
+  selectedWeekKey = weekKey > REAL_CURRENT_WEEK ? REAL_CURRENT_WEEK : weekKey;
   state = history[selectedWeekKey]||{};
   localStorage.setItem(WEEK_PREF_KEY, selectedWeekKey);
   activeDay = getActiveDayForWeek(selectedWeekKey);
