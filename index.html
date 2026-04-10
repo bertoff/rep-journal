@@ -126,14 +126,16 @@
   .week-picker-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;}
   .week-picker-card label{display:block;font-size:0.56rem;color:var(--muted2);letter-spacing:2px;margin-bottom:8px;}
   .week-picker-card input[type=date],
-  .week-picker-card input[type=number]{
+  .week-picker-card input[type=number],
+  .week-picker-card select{
     width:100%;max-width:100%;display:block;min-width:0;
     background:var(--surface2);border:1px solid var(--border);border-radius:6px;
     color:var(--text);font-family:'DM Mono',monospace;font-size:0.75rem;padding:9px 12px;
     letter-spacing:1px;outline:none;
   }
   .week-picker-card input[type=date]:focus,
-  .week-picker-card input[type=number]:focus{border-color:var(--muted2);}
+  .week-picker-card input[type=number]:focus,
+  .week-picker-card select:focus{border-color:var(--muted2);}
   .week-resolved{margin-top:10px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;color:var(--muted2);}
   .week-resolved span{color:var(--text);}
 
@@ -237,7 +239,7 @@
   <div class="content" style="padding-bottom:0;">
     <div class="week-picker-card" style="margin-bottom:10px;">
       <label>ACTIVE LOGGING WEEK</label>
-      <input type="number" id="logWeekNumberInput" min="1" step="1" onchange="onLogWeekNumberChange()" oninput="onLogWeekNumberChange()">
+      <select id="logWeekSelect" onchange="onLogWeekSelectChange()"></select>
       <div class="week-resolved" id="logWeekResolved">—</div>
     </div>
   </div>
@@ -261,7 +263,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.12';
+const APP_VERSION='2026.04.10.14';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -293,6 +295,17 @@ function weekKeyFromNumber(weekNumber){
   d.setDate(d.getDate()+((n-1)*7));
   return mondayStr(d);
 }
+function populateWeekSelect(selectedWeekNumber){
+  const sel=document.getElementById('logWeekSelect');
+  if(!sel) return;
+  const maxWeek=Math.max(selectedWeekNumber+8,getWeekNumber(mondayDate(REAL_CURRENT_WEEK))+8,12);
+  let html='';
+  for(let w=1;w<=maxWeek;w++){
+    html+=`<option value="${w}">WEEK ${w}</option>`;
+  }
+  sel.innerHTML=html;
+  sel.value=String(selectedWeekNumber);
+}
 
 const HISTORY_KEY='repjournal_v3';
 const WEEK_PREF_KEY='repjournal_active_week';
@@ -311,16 +324,13 @@ Object.keys(history).forEach(weekKey=>{
 });
 let selectedWeekKey = localStorage.getItem(WEEK_PREF_KEY) || REAL_CURRENT_WEEK;
 if(selectedWeekKey < PROGRAM_START_WEEK_KEY) selectedWeekKey = PROGRAM_START_WEEK_KEY;
-if(!history[selectedWeekKey])history[selectedWeekKey]={};
-let state=history[selectedWeekKey];
+let state=history[selectedWeekKey]||{};
 function persist(){history[selectedWeekKey]=state;saveHistory(history);}
 saveHistory(history);
 
 function getPrevWeekKey(weekKey){
-  const weeks = Object.keys(history).sort();
-  const idx = weeks.indexOf(weekKey);
-  if(idx<=0) return null;
-  return weeks[idx-1];
+  const weeks = getLoggedWeekKeys().filter(wk=>wk<weekKey);
+  return weeks.length?weeks[weeks.length-1]:null;
 }
 
 function getPrevSetReps(dayId, setIdx){
@@ -352,16 +362,14 @@ function setActiveDayForWeek(weekKey,dayId){
 }
 function setSelectedWeek(weekKey){
   selectedWeekKey = weekKey;
-  if(!history[selectedWeekKey]) history[selectedWeekKey] = {};
-  state = history[selectedWeekKey];
+  state = history[selectedWeekKey]||{};
   localStorage.setItem(WEEK_PREF_KEY, selectedWeekKey);
   activeDay = getActiveDayForWeek(selectedWeekKey);
 }
-function onLogWeekNumberChange(){
-  const inp = document.getElementById('logWeekNumberInput');
+function onLogWeekSelectChange(){
+  const inp = document.getElementById('logWeekSelect');
   if(!inp) return;
   const weekNumber=Math.max(1,parseInt(inp.value,10)||1);
-  if(String(weekNumber)!==String(inp.value)) inp.value=String(weekNumber);
   setSelectedWeek(weekKeyFromNumber(weekNumber));
   renderLog();
 }
@@ -435,6 +443,13 @@ function weekTotals(weekData){
   let pull=0,dip=0;
   DAYS.forEach(d=>{const t=dayTotal(weekData,d.id);if(d.type==='pull')pull+=t;else dip+=t;});
   return{pull,dip};
+}
+function weekHasData(weekData){
+  const wt=weekTotals(weekData||{});
+  return (wt.pull+wt.dip)>0;
+}
+function getLoggedWeekKeys(){
+  return Object.keys(history).filter(wk=>weekHasData(history[wk]||{})).sort();
 }
 function getToday(){return(new Date().getDay()+6)%7;}
 function isLadderSetLogged(dayData,setIdx){
@@ -536,13 +551,7 @@ function renderLog(){
   const weekNum = getWeekNumber(mondayDate(selectedWeekKey));
   const isCurrentWeek = selectedWeekKey === REAL_CURRENT_WEEK;
   document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(selectedWeekKey) + ')' + (isCurrentWeek ? '' : ' - CUSTOM');
-  const weekInput = document.getElementById('logWeekNumberInput');
-  if(weekInput){
-    weekInput.min = '1';
-    if(weekInput.value !== String(weekNum)){
-      weekInput.value = String(weekNum);
-    }
-  }
+  populateWeekSelect(weekNum);
   const weekResolved = document.getElementById('logWeekResolved');
   if(weekResolved){
     weekResolved.innerHTML = `LOGGING IN <span>${fmtWeek(selectedWeekKey)}</span>`;
@@ -623,7 +632,7 @@ function toggleHistWeek(el){el.nextElementSibling.classList.toggle('open');}
 
 function renderProgress(){
   const pc=document.getElementById('progressContent');
-  const weeks=Object.keys(history).sort();
+  const weeks=getLoggedWeekKeys();
   const type=progressType;
   const color=type==='pull'?'#4fc3f7':'#ff8a65';
   const colorA=type==='pull'?'rgba(79,195,247,.14)':'rgba(255,138,101,.14)';
