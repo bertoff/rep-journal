@@ -125,13 +125,15 @@
 
   .week-picker-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;}
   .week-picker-card label{display:block;font-size:0.56rem;color:var(--muted2);letter-spacing:2px;margin-bottom:8px;}
-  .week-picker-card input[type=date]{
+  .week-picker-card input[type=date],
+  .week-picker-card input[type=number]{
     width:100%;max-width:100%;display:block;min-width:0;
     background:var(--surface2);border:1px solid var(--border);border-radius:6px;
     color:var(--text);font-family:'DM Mono',monospace;font-size:0.75rem;padding:9px 12px;
     letter-spacing:1px;outline:none;
   }
-  .week-picker-card input[type=date]:focus{border-color:var(--muted2);}
+  .week-picker-card input[type=date]:focus,
+  .week-picker-card input[type=number]:focus{border-color:var(--muted2);}
   .week-resolved{margin-top:10px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;color:var(--muted2);}
   .week-resolved span{color:var(--text);}
 
@@ -175,8 +177,8 @@
   .progress-subtitle{font-size:0.58rem;color:var(--muted2);letter-spacing:2px;margin-bottom:16px;}
   .type-toggle{display:flex;gap:8px;margin-bottom:18px;}
   .type-btn{flex:1;padding:9px;border:1px solid var(--border);background:none;font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;transition:all .12s;color:var(--muted2);}
-  .type-btn.active.pull{background:rgba(178,216,178,.1);border-color:var(--pull);color:var(--pull);}
-  .type-btn.active.dip {background:rgba(240,240,240,.1);border-color:var(--dip); color:var(--dip);}
+  .type-btn.active.pull{background:rgba(79,195,247,.1);border-color:var(--submax-day);color:var(--submax-day);}
+  .type-btn.active.dip {background:rgba(255,138,101,.1);border-color:var(--max-day); color:var(--max-day);}
   .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px;margin-bottom:13px;}
   .chart-title{font-size:0.56rem;color:var(--muted2);letter-spacing:2px;margin-bottom:13px;}
 
@@ -188,16 +190,16 @@
   .hw-label{font-size:0.58rem;color:var(--muted2);letter-spacing:1px;}
   .hw-current{font-size:0.48rem;color:var(--muted2);letter-spacing:1px;margin-top:2px;}
   .hw-total{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:2px;}
-  .hw-total.pull{color:var(--pull);}
-  .hw-total.dip {color:var(--dip);}
+  .hw-total.pull{color:var(--submax-day);}
+  .hw-total.dip {color:var(--max-day);}
   .hw-body{padding:0 14px 10px;display:none;}
   .hw-body.open{display:block;}
   .hw-day-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.58rem;}
   .hw-day-row:last-child{border-bottom:none;}
   .hw-day-name{color:var(--muted2);letter-spacing:1px;}
   .hw-day-val{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;}
-  .hw-day-val.pull{color:var(--pull);}
-  .hw-day-val.dip {color:var(--dip);}
+  .hw-day-val.pull{color:var(--submax-day);}
+  .hw-day-val.dip {color:var(--max-day);}
   .no-data{text-align:center;padding:34px 20px;color:var(--muted2);font-size:0.6rem;letter-spacing:2px;}
 
   /* TIMER */
@@ -235,7 +237,7 @@
   <div class="content" style="padding-bottom:0;">
     <div class="week-picker-card" style="margin-bottom:10px;">
       <label>ACTIVE LOGGING WEEK</label>
-      <input type="date" id="logWeekInput" onchange="onLogWeekDateChange()">
+      <input type="number" id="logWeekNumberInput" min="1" step="1" onchange="onLogWeekNumberChange()" oninput="onLogWeekNumberChange()">
       <div class="week-resolved" id="logWeekResolved">—</div>
     </div>
   </div>
@@ -259,7 +261,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.10';
+const APP_VERSION='2026.04.10.12';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -284,6 +286,12 @@ function getWeekNumber(d){
   const diffMs = weekMonday - startMonday;
   const weeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1;
   return Math.max(1, weeks);
+}
+function weekKeyFromNumber(weekNumber){
+  const n=Math.max(1,parseInt(weekNumber,10)||1);
+  const d=mondayDate(PROGRAM_START_WEEK_KEY);
+  d.setDate(d.getDate()+((n-1)*7));
+  return mondayStr(d);
 }
 
 const HISTORY_KEY='repjournal_v3';
@@ -349,13 +357,12 @@ function setSelectedWeek(weekKey){
   localStorage.setItem(WEEK_PREF_KEY, selectedWeekKey);
   activeDay = getActiveDayForWeek(selectedWeekKey);
 }
-function onLogWeekDateChange(){
-  const inp = document.getElementById('logWeekInput');
-  if(!inp || !inp.value) return;
-  const chosen = new Date(inp.value + 'T00:00:00');
-  const chosenWeek = mondayStr(chosen);
-  const finalWeek = chosenWeek < PROGRAM_START_WEEK_KEY ? PROGRAM_START_WEEK_KEY : chosenWeek;
-  setSelectedWeek(finalWeek);
+function onLogWeekNumberChange(){
+  const inp = document.getElementById('logWeekNumberInput');
+  if(!inp) return;
+  const weekNumber=Math.max(1,parseInt(inp.value,10)||1);
+  if(String(weekNumber)!==String(inp.value)) inp.value=String(weekNumber);
+  setSelectedWeek(weekKeyFromNumber(weekNumber));
   renderLog();
 }
 
@@ -529,11 +536,11 @@ function renderLog(){
   const weekNum = getWeekNumber(mondayDate(selectedWeekKey));
   const isCurrentWeek = selectedWeekKey === REAL_CURRENT_WEEK;
   document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(selectedWeekKey) + ')' + (isCurrentWeek ? '' : ' - CUSTOM');
-  const weekInput = document.getElementById('logWeekInput');
+  const weekInput = document.getElementById('logWeekNumberInput');
   if(weekInput){
-    weekInput.min = fmtDateInput(mondayDate(PROGRAM_START_WEEK_KEY));
-    if(weekInput.value !== fmtDateInput(mondayDate(selectedWeekKey))){
-      weekInput.value = fmtDateInput(mondayDate(selectedWeekKey));
+    weekInput.min = '1';
+    if(weekInput.value !== String(weekNum)){
+      weekInput.value = String(weekNum);
     }
   }
   const weekResolved = document.getElementById('logWeekResolved');
@@ -618,19 +625,19 @@ function renderProgress(){
   const pc=document.getElementById('progressContent');
   const weeks=Object.keys(history).sort();
   const type=progressType;
-  const color='#b2d8b2';
-  const colorA='rgba(178,216,178,.12)';
+  const color=type==='pull'?'#4fc3f7':'#ff8a65';
+  const colorA=type==='pull'?'rgba(79,195,247,.14)':'rgba(255,138,101,.14)';
   const wkLabels=[],wkTotals=[];
   weeks.forEach(wk=>{wkLabels.push(fmtWeekShort(wk));const wt=weekTotals(history[wk]||{});wkTotals.push(type==='pull'?wt.pull:wt.dip);});
   const typeDays=DAYS.filter(d=>d.type===type);
-  const palette=['#f0f0f0','#cccccc','#aaaaaa'];
+  const workoutColorMap={max:'#ff8a65',volume:'#4fc3f7',ladder:'#ffd54f'};
   const dayDatasets=typeDays.map((day,i)=>({
     label: WORKOUT_LABELS[day.workout].split(' - ')[0],
     data:weeks.map(wk=>dayTotal(history[wk]||{},day.id)),
-    borderColor:palette[i%palette.length],
+    borderColor:workoutColorMap[day.workout],
     backgroundColor:'transparent',
     tension:0.35,pointRadius:4,
-    pointBackgroundColor:palette[i%palette.length],
+    pointBackgroundColor:workoutColorMap[day.workout],
     borderWidth:2,
   }));
 
@@ -642,7 +649,7 @@ function renderProgress(){
       let typeSets = {};
       DAYS.filter(d=>d.type===type).forEach(day=>{
         const dayTypeLabel = day.workout === 'max' ? 'Max Days' : day.workout === 'volume' ? 'Sub Max Volume' : 'Ladder Volume';
-        if(!typeSets[dayTypeLabel]) typeSets[dayTypeLabel] = [];
+        if(!typeSets[dayTypeLabel]) typeSets[dayTypeLabel] = {values:[], accent:workoutVar(day.workout)};
         for(let s=0; s<day.sets; s++){
           let setReps = 0;
           if(day.workout === 'ladder'){
@@ -652,14 +659,15 @@ function renderProgress(){
             setReps = wd[day.id]?.[`set_${s}`] || 0;
           }
           if(setReps > 0){
-            typeSets[dayTypeLabel].push(`${setReps}`);
+            typeSets[dayTypeLabel].values.push(`${setReps}`);
           }
         }
       });
       let drows = '';
       Object.keys(typeSets).forEach(typeLabel => {
-        if(typeSets[typeLabel].length > 0){
-          drows += `<div class="hw-day-row"><span class="hw-day-name">${typeLabel}</span><span class="hw-day-val ${type}">${typeSets[typeLabel].join(', ')}</span></div>`;
+        const series=typeSets[typeLabel];
+        if(series.values.length > 0){
+          drows += `<div class="hw-day-row"><span class="hw-day-name">${typeLabel}</span><span class="hw-day-val" style="color:var(--${series.accent})">${series.values.join(', ')}</span></div>`;
         }
       });
       histHtml+=`<div class="history-week"><div class="hw-header" ontouchend="toggleHistWeek(this)"><div><div class="hw-label">${fmtWeek(wk)}</div>${isCur?'<div class="hw-current">ACTIVE LOG WEEK</div>':''}</div><div class="hw-total ${type}">${tot} <span style="font-size:.62rem;font-family:'DM Mono';color:var(--muted2)">REPS</span></div></div><div class="hw-body">${drows}</div></div>`;
