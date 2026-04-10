@@ -250,8 +250,10 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.4';
+const APP_VERSION='2026.04.10.5';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
+const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
+const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
 
 // ?? STORAGE ??????????????????????????????????????????????????????????????????
 function mondayStr(d=new Date()){
@@ -268,8 +270,7 @@ function fmtWeek(str){
 function fmtWeekShort(str){return mondayDate(str).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}).toUpperCase();}
 
 function getWeekNumber(d){
-  const START_DATE = new Date(2026, 2, 16); // 16 March 2026
-  const startMonday = mondayDate(mondayStr(START_DATE));
+  const startMonday = mondayDate(PROGRAM_START_WEEK_KEY);
   const weekMonday = mondayDate(mondayStr(d));
   const diffMs = weekMonday - startMonday;
   const weeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1;
@@ -288,10 +289,15 @@ function saveActiveDayMap(map){localStorage.setItem(ACTIVE_DAY_MAP_KEY,JSON.stri
 
 let history=loadHistory();
 let activeDayByWeek=loadActiveDayMap();
+Object.keys(history).forEach(weekKey=>{
+  if(weekKey < PROGRAM_START_WEEK_KEY) delete history[weekKey];
+});
 let selectedWeekKey = localStorage.getItem(WEEK_PREF_KEY) || REAL_CURRENT_WEEK;
+if(selectedWeekKey < PROGRAM_START_WEEK_KEY) selectedWeekKey = PROGRAM_START_WEEK_KEY;
 if(!history[selectedWeekKey])history[selectedWeekKey]={};
 let state=history[selectedWeekKey];
 function persist(){history[selectedWeekKey]=state;saveHistory(history);}
+saveHistory(history);
 
 function getPrevWeekKey(weekKey){
   const weeks = Object.keys(history).sort();
@@ -338,7 +344,9 @@ function onLogWeekDateChange(){
   const inp = document.getElementById('logWeekInput');
   if(!inp || !inp.value) return;
   const chosen = new Date(inp.value + 'T00:00:00');
-  setSelectedWeek(mondayStr(chosen));
+  const chosenWeek = mondayStr(chosen);
+  const finalWeek = chosenWeek < PROGRAM_START_WEEK_KEY ? PROGRAM_START_WEEK_KEY : chosenWeek;
+  setSelectedWeek(finalWeek);
   renderLog();
 }
 
@@ -483,8 +491,11 @@ function renderLog(){
   const isCurrentWeek = selectedWeekKey === REAL_CURRENT_WEEK;
   document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(selectedWeekKey) + ')' + (isCurrentWeek ? '' : ' - CUSTOM');
   const weekInput = document.getElementById('logWeekInput');
-  if(weekInput && weekInput.value !== fmtDateInput(mondayDate(selectedWeekKey))){
-    weekInput.value = fmtDateInput(mondayDate(selectedWeekKey));
+  if(weekInput){
+    weekInput.min = fmtDateInput(mondayDate(PROGRAM_START_WEEK_KEY));
+    if(weekInput.value !== fmtDateInput(mondayDate(selectedWeekKey))){
+      weekInput.value = fmtDateInput(mondayDate(selectedWeekKey));
+    }
   }
   const weekResolved = document.getElementById('logWeekResolved');
   if(weekResolved){
