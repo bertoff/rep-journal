@@ -208,7 +208,6 @@
     <h1>REP JOURNAL</h1>
     <div class="week-label" id="weekLabel">-</div>
     <div class="version-badge" id="versionBadge">BUILD -</div>
-    <div class="build-label" id="buildLabel">BUILD -</div>
   </div>
   <div style="text-align:right">
     <div style="font-size:.53rem;color:var(--muted2);letter-spacing:2px">TODAY</div>
@@ -251,9 +250,8 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.3';
+const APP_VERSION='2026.04.10.4';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
-const BUILD_VERSION='v14';
 
 // ?? STORAGE ??????????????????????????????????????????????????????????????????
 function mondayStr(d=new Date()){
@@ -492,8 +490,6 @@ function renderLog(){
   if(weekResolved){
     weekResolved.innerHTML = `LOGGING IN <span>${fmtWeek(selectedWeekKey)}</span>`;
   }
-  const buildLabel = document.getElementById('buildLabel');
-  if(buildLabel) buildLabel.textContent = 'BUILD ' + BUILD_VERSION;
 }
 
 function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);if(ds[k]===0)ds[`${k}_done`]=false;persist();renderLog();}
