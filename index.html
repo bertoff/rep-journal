@@ -44,16 +44,18 @@
   /* CONTENT */
   .content{padding:18px 20px;}
   .workout-title{font-family:'Bebas Neue',sans-serif;font-size:2.7rem;letter-spacing:3px;line-height:1;}
-  .workout-title.pull{color:var(--pull);}
-  .workout-title.dip {color:var(--dip);}
+  .workout-title.max{color:var(--max-day);}
+  .workout-title.volume{color:var(--submax-day);}
+  .workout-title.ladder{color:var(--ladder-day);}
   .workout-subtitle{font-size:0.58rem;color:var(--muted2);letter-spacing:2px;margin-top:3px;margin-bottom:18px;}
 
   .totals-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
   .total-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
   .total-card .label{font-size:0.56rem;color:var(--muted2);letter-spacing:2px;margin-bottom:3px;}
   .total-card .number{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:2px;line-height:1;}
-  .total-card.pull .number{color:var(--pull);}
-  .total-card.dip  .number{color:var(--dip);}
+  .total-card.max .number{color:var(--max-day);}
+  .total-card.volume .number{color:var(--submax-day);}
+  .total-card.ladder .number{color:var(--ladder-day);}
 
   /* SETS */
   .sets-container{display:flex;flex-direction:column;gap:10px;}
@@ -74,14 +76,19 @@
   .done-btn:active{background:var(--border);}
   .rep-prev{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--muted);padding:4px 0;min-width:56px;}
   .done-btn{width:100%;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:1px;line-height:1;}
-  .set-done{opacity:0.85;border-color:var(--pull);box-shadow:0 0 0 1px rgba(200,245,90,0.2);}
+  .set-done{opacity:0.85;}
+  .set-done.max{border-color:var(--max-day);box-shadow:0 0 0 1px rgba(255,138,101,0.22);}
+  .set-done.volume{border-color:var(--submax-day);box-shadow:0 0 0 1px rgba(79,195,247,0.22);}
+  .set-done.ladder{border-color:var(--ladder-day);box-shadow:0 0 0 1px rgba(255,213,79,0.22);}
   .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
-  .rep-value.pull{color:var(--pull);}
-  .rep-value.dip {color:var(--dip);}
+  .rep-value.max{color:var(--max-day);}
+  .rep-value.volume{color:var(--submax-day);}
+  .rep-value.ladder{color:var(--ladder-day);}
   .rep-value.zero{color:var(--muted);}
   .rep-value-input{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);border-left:none;border-right:none;padding:4px 0;min-width:56px;color:var(--text);outline:none;appearance:textfield;-moz-appearance:textfield;}
-  .rep-value-input.pull{color:var(--pull);}
-  .rep-value-input.dip {color:var(--dip);}
+  .rep-value-input.max{color:var(--max-day);}
+  .rep-value-input.volume{color:var(--submax-day);}
+  .rep-value-input.ladder{color:var(--ladder-day);}
   .rep-value-input.zero{color:var(--muted);}
   .rep-value-input::-webkit-outer-spin-button,
   .rep-value-input::-webkit-inner-spin-button{appearance:none;margin:0;}
@@ -91,8 +98,9 @@
   .rung-row{display:flex;align-items:center;gap:8px;}
   .rung-num{font-size:0.56rem;color:var(--muted2);width:46px;letter-spacing:1px;flex-shrink:0;}
   .rung-toggle{flex:1;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;user-select:none;}
-  .rung-toggle.done.pull{background:rgba(178,216,178,.08);border-color:var(--pull);color:var(--pull);}
-  .rung-toggle.done.dip {background:rgba(240,240,240,.08);border-color:var(--dip); color:var(--dip);}
+  .rung-toggle.done.max{background:rgba(255,138,101,.08);border-color:var(--max-day);color:var(--max-day);}
+  .rung-toggle.done.volume{background:rgba(79,195,247,.08);border-color:var(--submax-day);color:var(--submax-day);}
+  .rung-toggle.done.ladder{background:rgba(255,213,79,.08);border-color:var(--ladder-day);color:var(--ladder-day);}
   .rung-toggle.failed{background:rgba(170,170,170,.05);border-color:#aaaaaa33;color:#aaaaaa55;text-decoration:line-through;}
   .add-rung-btn{width:100%;height:28px;border:1px dashed var(--border);border-radius:6px;background:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:1px;cursor:pointer;transition:all .12s;margin-top:3px;}
   .add-rung-btn:hover{border-color:var(--text);color:var(--text);}
@@ -197,8 +205,9 @@
   .timer-panel.active{display:flex;}
   .timer-info{font-size:0.63rem;color:var(--muted2);letter-spacing:3px;}
   .timer-display{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--text);min-width:50px;}
-  .timer-display.pull{color:var(--pull);}
-  .timer-display.dip{color:var(--dip);}
+  .timer-display.max{color:var(--max-day);}
+  .timer-display.volume{color:var(--submax-day);}
+  .timer-display.ladder{color:var(--ladder-day);}
   .timer-skip{padding:8px 16px;border:1px solid var(--border);background:var(--surface2);color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;pointer-events:auto;}
 
 </style>
@@ -250,7 +259,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.9';
+const APP_VERSION='2026.04.10.10';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -376,7 +385,7 @@ function startTimer(workoutType, dayId, setIdx, duration){
   
   const label = workoutType==='max'?'REST - NEXT SET':'volume'===workoutType?'REST - NEXT SET':'REST - NEXT RUNG';
   info.textContent = label;
-  disp.className = 'timer-display ' + (workoutType==='ladder'?'pull':(workoutType==='max'?'dip':'pull'));
+  disp.className = 'timer-display ' + workoutType;
   updateGlobalTimerDisplay();
   panel.classList.add('active');
   document.body.classList.add('timer-active');
@@ -440,6 +449,11 @@ function nextWeekKey(weekKey){
   d.setDate(d.getDate()+7);
   return mondayStr(d);
 }
+function workoutVar(workout){
+  if(workout==='max') return 'max-day';
+  if(workout==='volume') return 'submax-day';
+  return 'ladder-day';
+}
 
 // ?? LOG VIEW ??????????????????????????????????????????????????????????????????
 let activeDay=getActiveDayForWeek(selectedWeekKey);
@@ -458,30 +472,34 @@ function renderTabs(){
   });
 }
 
-function renderStdSets(day,ds,type){
+function renderStdSets(day,ds){
   let h='';
+  const workoutClass=day.workout;
+  const accent=workoutVar(day.workout);
   for(let s=0;s<day.sets;s++){
     const val = ds[`set_${s}`] !== undefined ? ds[`set_${s}`] : 0;
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
-    const cc = val === 0 ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})">v</button></div></div></div>`;
+    const cc = val === 0 ? 'zero' : workoutClass;
+    h+=`<div class="set-card${done?` set-done ${workoutClass}`:''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})">v</button></div></div></div>`;
   }
   return h;
 }
 
-function renderLadderSets(day,ds,type){
+function renderLadderSets(day,ds){
   let h='';
+  const workoutClass=day.workout;
+  const accent=workoutVar(day.workout);
   for(let s=0;s<day.sets;s++){
     const rungs=ds[`set_${s}`]||[];
     const setTot=rungs.reduce((a,r)=>a+(r.failed?0:r.reps),0);
     let rh='';
     rungs.forEach((r,ri)=>{
-      const sc=r.failed?'failed':(r.done?`done ${type}`:'');
+      const sc=r.failed?'failed':(r.done?`done ${workoutClass}`:'');
       const ic=r.failed?'x':(r.done?'v':'o');
       rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}x)</div><button class="rung-toggle ${sc}" onclick="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchend="failRung(${day.id},${s},${ri})">x</button></div>`;
     });
-    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS</div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" onclick="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
+    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${setTot}</span> REPS</div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" onclick="addRung(${day.id},${s},'${workoutClass}')">+ ADD NEXT RUNG</button></div></div>`;
   }
   return h;
 }
@@ -489,13 +507,13 @@ function renderLadderSets(day,ds,type){
 function renderLog(){
   renderTabs();
   const day=DAYS[activeDay],ds=dayState(state,activeDay);
-  const type=day.type,tot=dayTotal(state,activeDay),wt=weekTotals(state);
+  const type=day.type,workoutClass=day.workout,accent=workoutVar(day.workout),tot=dayTotal(state,activeDay),wt=weekTotals(state);
   const weekReady=isWeekReadyToComplete(state);
-  const setsHtml=day.workout==='ladder'?renderLadderSets(day,ds,type):renderStdSets(day,ds,type);
+  const setsHtml=day.workout==='ladder'?renderLadderSets(day,ds):renderStdSets(day,ds);
   document.getElementById('content').innerHTML=`
-    <div><div class="workout-title ${type}">${type==='pull'?'PULL UPS':'DIPS'}</div><div class="workout-subtitle">${WORKOUT_LABELS[day.workout]}</div></div>
+    <div><div class="workout-title ${workoutClass}">${type==='pull'?'PULL UPS':'DIPS'}</div><div class="workout-subtitle">${WORKOUT_LABELS[day.workout]}</div></div>
     <div class="totals-bar">
-      <div class="total-card ${type}"><div class="label">TODAY</div><div class="number">${tot}</div></div>
+      <div class="total-card ${workoutClass}"><div class="label">TODAY</div><div class="number">${tot}</div></div>
     </div>
     <div class="sets-container">${setsHtml}</div>
     <div class="week-summary">
@@ -504,7 +522,7 @@ function renderLog(){
         <div class="week-stat"><div class="label">PULL UPS</div><div class="val pull">${wt.pull}</div></div>
         <div class="week-stat"><div class="label">DIPS</div><div class="val dip">${wt.dip}</div></div>
       </div>
-      <button class="reset-btn" ontouchend="completeWeekAndAdvance()" onclick="completeWeekAndAdvance()" ${weekReady?'':'disabled'} style="margin-top:12px;${weekReady?'border-color:var(--pull);color:var(--pull);':'opacity:0.45;cursor:not-allowed;'}">${weekReady?'COMPLETE WEEK & START NEXT':'FINISH SAT LADDER (ALL 5 SETS) TO ADVANCE'}</button>
+      <button class="reset-btn" ontouchend="completeWeekAndAdvance()" onclick="completeWeekAndAdvance()" ${weekReady?'':'disabled'} style="margin-top:12px;${weekReady?`border-color:var(--${accent});color:var(--${accent});`:'opacity:0.45;cursor:not-allowed;'}">${weekReady?'COMPLETE WEEK & START NEXT':'FINISH SAT LADDER (ALL 5 SETS) TO ADVANCE'}</button>
     </div>`;
   const versionBadge = document.getElementById('versionBadge');
   if(versionBadge) versionBadge.textContent='BUILD ' + APP_VERSION;
