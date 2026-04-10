@@ -76,10 +76,10 @@
   .done-btn:active{background:var(--border);}
   .rep-prev{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--muted);padding:4px 0;min-width:56px;}
   .done-btn{width:100%;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:1px;line-height:1;}
-  .set-done{opacity:0.85;}
-  .set-done.max{border-color:var(--max-day);box-shadow:0 0 0 1px rgba(255,138,101,0.22);}
-  .set-done.volume{border-color:var(--submax-day);box-shadow:0 0 0 1px rgba(79,195,247,0.22);}
-  .set-done.ladder{border-color:var(--ladder-day);box-shadow:0 0 0 1px rgba(255,213,79,0.22);}
+  .set-done{opacity:1;}
+  .set-done.max{border-color:var(--max-day);box-shadow:0 0 0 1px rgba(255,138,101,0.22);background:rgba(255,138,101,0.06);}
+  .set-done.volume{border-color:var(--submax-day);box-shadow:0 0 0 1px rgba(79,195,247,0.22);background:rgba(79,195,247,0.06);}
+  .set-done.ladder{border-color:var(--ladder-day);box-shadow:0 0 0 1px rgba(255,213,79,0.22);background:rgba(255,213,79,0.06);}
   .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
   .rep-value.max{color:var(--max-day);}
   .rep-value.volume{color:var(--submax-day);}
@@ -263,7 +263,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.16';
+const APP_VERSION='2026.04.10.17';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -504,7 +504,7 @@ function renderStdSets(day,ds){
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : workoutClass;
-    h+=`<div class="set-card${done?` set-done ${workoutClass}`:''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})">v</button></div></div></div>`;
+    h+=`<div class="set-card${done?` set-done ${workoutClass}`:''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})" onclick="completeSet(${day.id},${s})">v</button></div></div></div>`;
   }
   return h;
 }
