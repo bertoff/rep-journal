@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -19,6 +19,7 @@
   header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;}
   h1{font-family:'Bebas Neue',sans-serif;font-size:2.1rem;letter-spacing:5px;line-height:1;}
   .week-label{font-size:0.56rem;color:var(--muted2);letter-spacing:2px;}
+  .build-label{font-size:0.5rem;color:var(--muted2);letter-spacing:2px;margin-top:3px;}
   #todayLabel{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;}
   .version-badge{margin-top:3px;font-size:0.5rem;color:var(--muted2);letter-spacing:1px;}
 
@@ -72,13 +73,16 @@
   .rep-prev{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--muted);padding:4px 0;min-width:56px;}
   .done-btn{width:100%;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:1px;line-height:1;}
   .set-done{opacity:0.85;border-color:var(--pull);box-shadow:0 0 0 1px rgba(200,245,90,0.2);}
-  .rep-value-input{flex:1;height:36px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);border-left:none;border-right:none;color:var(--text);outline:none;min-width:56px;}
+  .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
+  .rep-value.pull{color:var(--pull);}
+  .rep-value.dip {color:var(--dip);}
+  .rep-value.zero{color:var(--muted);}
+  .rep-value-input{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);border-left:none;border-right:none;padding:4px 0;min-width:56px;color:var(--text);outline:none;appearance:textfield;-moz-appearance:textfield;}
   .rep-value-input.pull{color:var(--pull);}
   .rep-value-input.dip {color:var(--dip);}
   .rep-value-input.zero{color:var(--muted);}
   .rep-value-input::-webkit-outer-spin-button,
-  .rep-value-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
-  .rep-value-input[type=number]{-moz-appearance:textfield;appearance:textfield;}
+  .rep-value-input::-webkit-inner-spin-button{appearance:none;margin:0;}
 
   /* LADDER */
   .ladder-rungs{padding:8px 14px 12px;display:flex;flex-direction:column;gap:5px;}
@@ -104,7 +108,7 @@
   .reset-btn{margin-top:14px;width:100%;padding:9px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:2px;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent;}
   .reset-btn:hover{border-color:#aaaaaa;color:#aaaaaa;}
 
-  /* ── PAST ENTRY VIEW ── */
+  /* ?? PAST ENTRY VIEW ?? */
   .past-view{padding:18px 20px;}
   .past-view > h2{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:4px;margin-bottom:4px;}
   .past-view > p{font-size:0.58rem;color:var(--muted2);letter-spacing:1px;margin-bottom:20px;line-height:1.6;}
@@ -201,8 +205,9 @@
 <header>
   <div>
     <h1>REP JOURNAL</h1>
-    <div class="week-label" id="weekLabel">—</div>
-    <div class="version-badge" id="versionBadge">BUILD —</div>
+    <div class="week-label" id="weekLabel">-</div>
+    <div class="version-badge" id="versionBadge">BUILD -</div>
+    <div class="build-label" id="buildLabel">BUILD -</div>
   </div>
   <div style="text-align:right">
     <div style="font-size:.53rem;color:var(--muted2);letter-spacing:2px">TODAY</div>
@@ -212,9 +217,9 @@
 </header>
 
 <div class="nav-bar">
-  <button class="nav-btn active" id="navLog"      ontouchend="switchView('log')">LOG</button>
-  <button class="nav-btn"        id="navPast"     ontouchend="switchView('past')">HISTORY</button>
-  <button class="nav-btn"        id="navProgress" ontouchend="switchView('progress')">PROGRESS</button>
+  <button class="nav-btn active" id="navLog"      ontouchend="switchView('log')" onclick="switchView('log')">LOG</button>
+  <button class="nav-btn"        id="navPast"     ontouchend="switchView('past')" onclick="switchView('past')">HISTORY</button>
+  <button class="nav-btn"        id="navProgress" ontouchend="switchView('progress')" onclick="switchView('progress')">PROGRESS</button>
 </div>
 
 <!-- LOG VIEW -->
@@ -239,12 +244,12 @@
     <div class="week-picker-card">
       <label>PICK ANY DATE IN THAT WEEK</label>
       <input type="date" id="pastDateInput" onchange="onPastDateChange()">
-      <div class="week-resolved" id="pastWeekResolved">— SELECT A DATE ABOVE —</div>
+      <div class="week-resolved" id="pastWeekResolved">- SELECT A DATE ABOVE -</div>
     </div>
 
     <div class="past-day-tabs" id="pastDayTabs"></div>
     <div id="pastSetsArea"></div>
-    <div class="save-toast" id="saveToast">✓ SAVED</div>
+    <div class="save-toast" id="saveToast">SAVED</div>
   </div>
 </div>
 
@@ -255,7 +260,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-// ── CONFIG ───────────────────────────────────────────────────────────────────
+// ?? CONFIG ???????????????????????????????????????????????????????????????????
 const DAYS = [
   {id:0,name:'MON',label:'MONDAY',   type:'pull',workout:'max',   sets:3 },
   {id:1,name:'TUE',label:'TUESDAY',  type:'dip', workout:'max',   sets:3 },
@@ -265,9 +270,10 @@ const DAYS = [
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
 const APP_VERSION='2026.04.10.1';
-const WORKOUT_LABELS={max:'MAX DAY — 3 × MAX REPS',volume:'SUB MAX VOLUME - 10 × VOLUME SETS',ladder:'LADDER VOLUME - 5 × LADDER SETS'};
+const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
+const BUILD_VERSION='v14';
 
-// ── STORAGE ──────────────────────────────────────────────────────────────────
+// ?? STORAGE ??????????????????????????????????????????????????????????????????
 function mondayStr(d=new Date()){
   const m=new Date(d);
   m.setDate(m.getDate()-((m.getDay()+6)%7));
@@ -347,7 +353,7 @@ function switchView(v){
   if(v==='past') initPastView();
 }
 
-// ── TIMER ─────────────────────────────────────────────────────────────────────
+// ?? TIMER ?????????????????????????????????????????????????????????????????????
 let timerInt=null, timerSecs=0, timerTarget=null, timerEnd=0;
 function startTimer(workoutType, dayId, setIdx, duration){
   const defaultDur = workoutType==='max'?300:workoutType==='volume'?60:workoutType==='ladder'?30:30;
@@ -360,7 +366,7 @@ function startTimer(workoutType, dayId, setIdx, duration){
   const info = document.getElementById('timerInfo');
   const disp = document.getElementById('timerDisplay');
   
-  const label = workoutType==='max'?'REST — NEXT SET':'volume'===workoutType?'REST — NEXT SET':'REST — NEXT RUNG';
+  const label = workoutType==='max'?'REST - NEXT SET':'volume'===workoutType?'REST - NEXT SET':'REST - NEXT RUNG';
   info.textContent = label;
   disp.className = 'timer-display ' + (workoutType==='ladder'?'pull':(workoutType==='max'?'dip':'pull'));
   updateGlobalTimerDisplay();
@@ -394,7 +400,7 @@ function skipTimer(){
   timerTarget=null;
 }
 
-// ── DATA HELPERS ──────────────────────────────────────────────────────────────
+// ?? DATA HELPERS ??????????????????????????????????????????????????????????????
 function dayState(weekData,dayId){if(!weekData[dayId])weekData[dayId]={};return weekData[dayId];}
 function dayTotal(weekData,dayId){
   const day=DAYS[dayId],ds=weekData[dayId]||{};
@@ -408,7 +414,7 @@ function weekTotals(weekData){
 }
 function getToday(){return(new Date().getDay()+6)%7;}
 
-// ── LOG VIEW ──────────────────────────────────────────────────────────────────
+// ?? LOG VIEW ??????????????????????????????????????????????????????????????????
 let activeDay=Math.min(getToday(),5);
 
 function renderTabs(){
@@ -417,7 +423,7 @@ function renderTabs(){
   DAYS.forEach(day=>{
     const b=document.createElement('button');
     b.className=`day-tab ${day.type}${day.id===activeDay?' active':''}`;
-    b.innerHTML=`<span class="dot"></span>${day.name}${day.id===today?' ●':''}`;
+    b.innerHTML=`<span class="dot"></span>${day.name}${day.id===today?' *':''}`;
     b.ontouchend=()=>{activeDay=day.id;renderLog();};
     c.appendChild(b);
   });
@@ -430,7 +436,7 @@ function renderStdSets(day,ds,type){
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">−</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setRepValue(${day.id},${s},this,false)" onchange="setRepValue(${day.id},${s},this,true)" onblur="setRepValue(${day.id},${s},this,true)"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><button class="done-btn" ontouchend="completeSet(${day.id},${s})">✓</button></div></div></div>`;
+    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})">v</button></div></div></div>`;
   }
   return h;
 }
@@ -443,10 +449,10 @@ function renderLadderSets(day,ds,type){
     let rh='';
     rungs.forEach((r,ri)=>{
       const sc=r.failed?'failed':(r.done?`done ${type}`:'');
-      const ic=r.failed?'✕':(r.done?'✓':'○');
-      rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}×)</div><button class="rung-toggle ${sc}" ontouchend="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchend="failRung(${day.id},${s},${ri})">✕</button></div>`;
+      const ic=r.failed?'x':(r.done?'v':'o');
+      rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}x)</div><button class="rung-toggle ${sc}" onclick="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchend="failRung(${day.id},${s},${ri})">x</button></div>`;
     });
-    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS</div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" ontouchend="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
+    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS</div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" onclick="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
   }
   return h;
 }
@@ -471,10 +477,11 @@ function renderLog(){
     </div>`;
   const today=getToday();
   document.getElementById('todayLabel').textContent=today<6?DAYS[today].name:'REST';
-  document.getElementById('versionBadge').textContent='BUILD ' + APP_VERSION;
+  const versionBadge = document.getElementById('versionBadge');
+  if(versionBadge) versionBadge.textContent='BUILD ' + APP_VERSION;
   const weekNum = getWeekNumber(mondayDate(selectedWeekKey));
   const isCurrentWeek = selectedWeekKey === REAL_CURRENT_WEEK;
-  document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(selectedWeekKey) + ')' + (isCurrentWeek ? '' : ' • CUSTOM');
+  document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(selectedWeekKey) + ')' + (isCurrentWeek ? '' : ' - CUSTOM');
   const weekInput = document.getElementById('logWeekInput');
   if(weekInput && weekInput.value !== fmtDateInput(mondayDate(selectedWeekKey))){
     weekInput.value = fmtDateInput(mondayDate(selectedWeekKey));
@@ -483,6 +490,8 @@ function renderLog(){
   if(weekResolved){
     weekResolved.innerHTML = `LOGGING IN <span>${fmtWeek(selectedWeekKey)}</span>`;
   }
+  const buildLabel = document.getElementById('buildLabel');
+  if(buildLabel) buildLabel.textContent = 'BUILD ' + BUILD_VERSION;
 }
 
 function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);if(ds[k]===0)ds[`${k}_done`]=false;persist();renderLog();}
@@ -503,6 +512,11 @@ function setRepValue(dayId,si,input,rerender){
   if(ds[k]===0)ds[`${k}_done`]=false;
   persist();
   if(rerender) renderLog();
+}
+function updateRepValueAndTimer(dayId,si,input){
+  setRepValue(dayId,si,input,false);
+  const day=DAYS[dayId];
+  if(day) startTimer(day.workout, dayId, si);
 }
 function promptRep(dayId,si){
   const input=document.querySelector(`[data-rep-input="${dayId}_${si}"]`);
@@ -536,7 +550,7 @@ function resetWeek(){
   renderLog();
 }
 
-// ── ADD PAST VIEW ─────────────────────────────────────────────────────────────
+// ?? ADD PAST VIEW ?????????????????????????????????????????????????????????????
 let pastWeekKey = null;   // currently selected past week key
 let pastActiveDay = 0;    // currently selected day in past entry
 // Transient state for the past entry form (per day)
@@ -562,7 +576,7 @@ function onPastDateChange(){
   // Don't allow editing the active logging week from this screen
   if(pastWeekKey === selectedWeekKey){
     document.getElementById('pastWeekResolved').innerHTML =
-      `<span style="color:#ff6b35">THAT'S YOUR ACTIVE LOGGING WEEK — USE THE LOG TAB</span>`;
+    `<span style="color:#ff6b35">THAT'S YOUR ACTIVE LOGGING WEEK - USE THE LOG TAB</span>`;
     document.getElementById('pastDayTabs').innerHTML='';
     document.getElementById('pastSetsArea').innerHTML='';
     return;
@@ -616,7 +630,7 @@ function renderPastSets(){
         rh+=`<div class="ladder-entry-row">
           <div class="le-label">RUNG ${ri+1} (${ri+1} REP${ri+1>1?'S':''})</div>
           <input type="number" min="0" value="${r.reps||ri+1}" readonly style="opacity:0.5;width:60px;flex:none;">
-          <button class="le-remove" ontouchend="pastRemoveRung(${s},${ri})">✕</button>
+          <button class="le-remove" ontouchend="pastRemoveRung(${s},${ri})">x</button>
         </div>`;
       });
       const setTot = rungs.reduce((a,r)=>a+r.reps,0);
@@ -645,7 +659,7 @@ function renderPastSets(){
           <div class="rep-input-row">
             <div class="rep-label">REPS</div>
             <div class="rep-controls">
-              <button class="rep-btn" ontouchend="pastChRep(${s},-1)">−</button>
+              <button class="rep-btn" ontouchend="pastChRep(${s},-1)">-</button>
               <input class="rep-value-input ${cc}" id="past_rep_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setPastRepValue(${s},this,false)" onchange="setPastRepValue(${s},this,true)" onblur="setPastRepValue(${s},this,true)">
               <button class="rep-btn" ontouchend="pastChRep(${s},1)">+</button>
             </div>
@@ -659,7 +673,7 @@ function renderPastSets(){
 }
 
 function saveBtnHtml(type){
-  return `<button class="save-past-btn ${type}" ontouchend="savePastDay()" style="margin-top:14px">SAVE THIS DAY ›</button>
+  return `<button class="save-past-btn ${type}" ontouchend="savePastDay()" style="margin-top:14px">SAVE THIS DAY ></button>
           <div class="save-toast" id="saveToast"></div>`;
 }
 
@@ -706,12 +720,12 @@ function savePastDay(){
   history[pastWeekKey][pastActiveDay] = JSON.parse(JSON.stringify(pastFormData[pastWeekKey][pastActiveDay]));
   saveHistory(history);
   const toast=document.getElementById('saveToast');
-  toast.textContent=`✓ ${DAYS[pastActiveDay].label} SAVED`;
+  toast.textContent=`SAVED ${DAYS[pastActiveDay].label}`;
   toast.className='save-toast show';
   setTimeout(()=>toast.className='save-toast',2000);
 }
 
-// ── PROGRESS VIEW ─────────────────────────────────────────────────────────────
+// ?? PROGRESS VIEW ?????????????????????????????????????????????????????????????
 let progressType='pull',chartWeekly=null,chartDay=null;
 function setProgressType(t){progressType=t;renderProgress();}
 function toggleHistWeek(el){el.nextElementSibling.classList.toggle('open');}
@@ -727,7 +741,7 @@ function renderProgress(){
   const typeDays=DAYS.filter(d=>d.type===type);
   const palette=['#f0f0f0','#cccccc','#aaaaaa'];
   const dayDatasets=typeDays.map((day,i)=>({
-    label: WORKOUT_LABELS[day.workout].split(' — ')[0],
+    label: WORKOUT_LABELS[day.workout].split(' - ')[0],
     data:weeks.map(wk=>dayTotal(history[wk]||{},day.id)),
     borderColor:palette[i%palette.length],
     backgroundColor:'transparent',
@@ -737,7 +751,7 @@ function renderProgress(){
   }));
 
   let histHtml='';
-  if(weeks.length===0){histHtml='<div class="no-data">NO DATA YET — START LOGGING!</div>';}
+  if(weeks.length===0){histHtml='<div class="no-data">NO DATA YET - START LOGGING!</div>';}
   else{
     [...weeks].reverse().forEach(wk=>{
       const wd=history[wk]||{},wt=weekTotals(wd),tot=type==='pull'?wt.pull:wt.dip,isCur=wk===selectedWeekKey;
@@ -796,7 +810,7 @@ function renderProgress(){
   });
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+// ?? INIT ??????????????????????????????????????????????????????????????????????
 renderLog();
 </script>
 
@@ -804,7 +818,7 @@ renderLog();
 <div class="timer-panel" id="timerPanel">
   <div class="timer-info" id="timerInfo">REST</div>
   <div class="timer-display" id="timerDisplay">00:00</div>
-  <button class="timer-skip" ontouchend="skipTimer()">SKIP</button>
+  <button class="timer-skip" onclick="skipTimer()">SKIP</button>
 </div>
 
 </body>
