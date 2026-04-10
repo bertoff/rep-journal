@@ -219,6 +219,13 @@
 
 <!-- LOG VIEW -->
 <div id="viewLog">
+  <div class="content" style="padding-bottom:0;">
+    <div class="week-picker-card" style="margin-bottom:10px;">
+      <label>ACTIVE LOGGING WEEK</label>
+      <input type="date" id="logWeekInput" onchange="onLogWeekDateChange()">
+      <div class="week-resolved" id="logWeekResolved">—</div>
+    </div>
+  </div>
   <div class="day-tabs" id="dayTabs"></div>
   <div class="content"  id="content"></div>
 </div>
@@ -257,7 +264,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.02.3';
+const APP_VERSION='2026.04.10.1';
 const WORKOUT_LABELS={max:'MAX DAY — 3 × MAX REPS',volume:'SUB MAX VOLUME - 10 × VOLUME SETS',ladder:'LADDER VOLUME - 5 × LADDER SETS'};
 
 // ── STORAGE ──────────────────────────────────────────────────────────────────
@@ -284,24 +291,48 @@ function getWeekNumber(d){
 }
 
 const HISTORY_KEY='repjournal_v3';
-const CURRENT_WEEK=mondayStr();
+const WEEK_PREF_KEY='repjournal_active_week';
+const REAL_CURRENT_WEEK=mondayStr();
 
 function loadHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY))||{};}catch{return {};}}
 function saveHistory(h){localStorage.setItem(HISTORY_KEY,JSON.stringify(h));}
 
 let history=loadHistory();
-if(!history[CURRENT_WEEK])history[CURRENT_WEEK]={};
-let state=history[CURRENT_WEEK];
-function persist(){history[CURRENT_WEEK]=state;saveHistory(history);}
+let selectedWeekKey = localStorage.getItem(WEEK_PREF_KEY) || REAL_CURRENT_WEEK;
+if(!history[selectedWeekKey])history[selectedWeekKey]={};
+let state=history[selectedWeekKey];
+function persist(){history[selectedWeekKey]=state;saveHistory(history);}
 
-const weeks = Object.keys(history).sort();
-const prevWeekKey = weeks.length > 0 && weeks.indexOf(CURRENT_WEEK) > 0 ? weeks[weeks.indexOf(CURRENT_WEEK) - 1] : null;
+function getPrevWeekKey(weekKey){
+  const weeks = Object.keys(history).sort();
+  const idx = weeks.indexOf(weekKey);
+  if(idx<=0) return null;
+  return weeks[idx-1];
+}
 
 function getPrevSetReps(dayId, setIdx){
+  const prevWeekKey = getPrevWeekKey(selectedWeekKey);
   if(!prevWeekKey) return 0;
   const prevData = history[prevWeekKey] || {};
   const dayData = prevData[dayId] || {};
   return dayData[`set_${setIdx}`] || 0;
+}
+
+function fmtDateInput(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function setSelectedWeek(weekKey){
+  selectedWeekKey = weekKey;
+  if(!history[selectedWeekKey]) history[selectedWeekKey] = {};
+  state = history[selectedWeekKey];
+  localStorage.setItem(WEEK_PREF_KEY, selectedWeekKey);
+}
+function onLogWeekDateChange(){
+  const inp = document.getElementById('logWeekInput');
+  if(!inp || !inp.value) return;
+  const chosen = new Date(inp.value + 'T00:00:00');
+  setSelectedWeek(mondayStr(chosen));
+  renderLog();
 }
 
 // ── VIEW SWITCHING ────────────────────────────────────────────────────────────
@@ -441,8 +472,17 @@ function renderLog(){
   const today=getToday();
   document.getElementById('todayLabel').textContent=today<6?DAYS[today].name:'REST';
   document.getElementById('versionBadge').textContent='BUILD ' + APP_VERSION;
-  const weekNum = getWeekNumber(mondayDate(CURRENT_WEEK));
-  document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(CURRENT_WEEK) + ')';
+  const weekNum = getWeekNumber(mondayDate(selectedWeekKey));
+  const isCurrentWeek = selectedWeekKey === REAL_CURRENT_WEEK;
+  document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(selectedWeekKey) + ')' + (isCurrentWeek ? '' : ' • CUSTOM');
+  const weekInput = document.getElementById('logWeekInput');
+  if(weekInput && weekInput.value !== fmtDateInput(mondayDate(selectedWeekKey))){
+    weekInput.value = fmtDateInput(mondayDate(selectedWeekKey));
+  }
+  const weekResolved = document.getElementById('logWeekResolved');
+  if(weekResolved){
+    weekResolved.innerHTML = `LOGGING IN <span>${fmtWeek(selectedWeekKey)}</span>`;
+  }
 }
 
 function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);if(ds[k]===0)ds[`${k}_done`]=false;persist();renderLog();}
@@ -488,7 +528,13 @@ function failRung(dayId,si,ri){
   persist();
   renderLog();
 }
-function resetWeek(){if(!confirm('Reset all data for this week?'))return;history[CURRENT_WEEK]={};state=history[CURRENT_WEEK];saveHistory(history);renderLog();}
+function resetWeek(){
+  if(!confirm(`Reset all data for week of ${fmtWeek(selectedWeekKey)}?`))return;
+  history[selectedWeekKey]={};
+  state=history[selectedWeekKey];
+  saveHistory(history);
+  renderLog();
+}
 
 // ── ADD PAST VIEW ─────────────────────────────────────────────────────────────
 let pastWeekKey = null;   // currently selected past week key
@@ -513,10 +559,10 @@ function onPastDateChange(){
   if(!inp.value) return;
   const chosen = new Date(inp.value + 'T00:00:00');
   pastWeekKey = mondayStr(chosen);
-  // Don't allow editing current week here
-  if(pastWeekKey === CURRENT_WEEK){
+  // Don't allow editing the active logging week from this screen
+  if(pastWeekKey === selectedWeekKey){
     document.getElementById('pastWeekResolved').innerHTML =
-      `<span style="color:#ff6b35">THAT'S THE CURRENT WEEK — USE THE LOG TAB</span>`;
+      `<span style="color:#ff6b35">THAT'S YOUR ACTIVE LOGGING WEEK — USE THE LOG TAB</span>`;
     document.getElementById('pastDayTabs').innerHTML='';
     document.getElementById('pastSetsArea').innerHTML='';
     return;
@@ -694,7 +740,7 @@ function renderProgress(){
   if(weeks.length===0){histHtml='<div class="no-data">NO DATA YET — START LOGGING!</div>';}
   else{
     [...weeks].reverse().forEach(wk=>{
-      const wd=history[wk]||{},wt=weekTotals(wd),tot=type==='pull'?wt.pull:wt.dip,isCur=wk===CURRENT_WEEK;
+      const wd=history[wk]||{},wt=weekTotals(wd),tot=type==='pull'?wt.pull:wt.dip,isCur=wk===selectedWeekKey;
       let typeSets = {};
       DAYS.filter(d=>d.type===type).forEach(day=>{
         const dayTypeLabel = day.workout === 'max' ? 'Max Days' : day.workout === 'volume' ? 'Sub Max Volume' : 'Ladder Volume';
@@ -718,7 +764,7 @@ function renderProgress(){
           drows += `<div class="hw-day-row"><span class="hw-day-name">${typeLabel}</span><span class="hw-day-val ${type}">${typeSets[typeLabel].join(', ')}</span></div>`;
         }
       });
-      histHtml+=`<div class="history-week"><div class="hw-header" ontouchend="toggleHistWeek(this)"><div><div class="hw-label">${fmtWeek(wk)}</div>${isCur?'<div class="hw-current">CURRENT WEEK</div>':''}</div><div class="hw-total ${type}">${tot} <span style="font-size:.62rem;font-family:'DM Mono';color:var(--muted2)">REPS</span></div></div><div class="hw-body">${drows}</div></div>`;
+      histHtml+=`<div class="history-week"><div class="hw-header" ontouchend="toggleHistWeek(this)"><div><div class="hw-label">${fmtWeek(wk)}</div>${isCur?'<div class="hw-current">ACTIVE LOG WEEK</div>':''}</div><div class="hw-total ${type}">${tot} <span style="font-size:.62rem;font-family:'DM Mono';color:var(--muted2)">REPS</span></div></div><div class="hw-body">${drows}</div></div>`;
     });
   }
 
