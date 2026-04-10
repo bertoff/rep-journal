@@ -9,6 +9,7 @@
   :root {
     --bg:#0d0d0d; --surface:#161616; --surface2:#1e1e1e;
     --border:#2a2a2a; --pull:#b2d8b2; --dip:#f0f0f0;
+    --max-day:#ff8a65; --submax-day:#4fc3f7; --ladder-day:#ffd54f;
     --text:#f0f0f0; --muted:#444; --muted2:#777;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -20,7 +21,6 @@
   h1{font-family:'Bebas Neue',sans-serif;font-size:2.1rem;letter-spacing:5px;line-height:1;}
   .week-label{font-size:0.56rem;color:var(--muted2);letter-spacing:2px;}
   .build-label{font-size:0.5rem;color:var(--muted2);letter-spacing:2px;margin-top:3px;}
-  #todayLabel{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;}
   .version-badge{margin-top:3px;font-size:0.5rem;color:var(--muted2);letter-spacing:1px;}
 
   /* NAV */
@@ -32,12 +32,14 @@
   .day-tabs{display:flex;overflow-x:auto;gap:4px;padding:14px 20px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-bottom:1px solid var(--border);}
   .day-tabs::-webkit-scrollbar{display:none;}
   .day-tab{flex-shrink:0;padding:7px 12px;border:1px solid var(--border);border-bottom:none;background:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:1px;cursor:pointer;border-radius:4px 4px 0 0;transition:all .12s;}
-  .day-tab.pull{border-top:2px solid var(--pull);}
-  .day-tab.dip {border-top:2px solid var(--dip);}
+  .day-tab.max{border-top:2px solid var(--max-day);}
+  .day-tab.volume{border-top:2px solid var(--submax-day);}
+  .day-tab.ladder{border-top:2px solid var(--ladder-day);}
   .day-tab.active{background:var(--surface);color:var(--text);}
   .day-tab .dot{display:inline-block;width:5px;height:5px;border-radius:50%;margin-right:5px;vertical-align:middle;}
-  .day-tab.pull .dot{background:var(--pull);}
-  .day-tab.dip  .dot{background:var(--dip);}
+  .day-tab.max .dot{background:var(--max-day);}
+  .day-tab.volume .dot{background:var(--submax-day);}
+  .day-tab.ladder .dot{background:var(--ladder-day);}
 
   /* CONTENT */
   .content{padding:18px 20px;}
@@ -210,8 +212,6 @@
     <div class="version-badge" id="versionBadge">BUILD -</div>
   </div>
   <div style="text-align:right">
-    <div style="font-size:.53rem;color:var(--muted2);letter-spacing:2px">TODAY</div>
-    <div id="todayLabel"></div>
     <button class="reset-btn" ontouchend="resetWeek()" style="font-size:0.5rem;margin-top:4px;">RESET WEEK</button>
   </div>
 </header>
@@ -250,7 +250,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.7';
+const APP_VERSION='2026.04.10.9';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -445,12 +445,14 @@ function nextWeekKey(weekKey){
 let activeDay=getActiveDayForWeek(selectedWeekKey);
 
 function renderTabs(){
-  const today=getToday(),isCurrentWeek=selectedWeekKey===REAL_CURRENT_WEEK,c=document.getElementById('dayTabs');
+  const c=document.getElementById('dayTabs');
   c.innerHTML='';
   DAYS.forEach(day=>{
     const b=document.createElement('button');
-    b.className=`day-tab ${day.type}${day.id===activeDay?' active':''}`;
-    b.innerHTML=`<span class="dot"></span>${day.name}${isCurrentWeek&&day.id===today?' *':''}`;
+    const dayLabel = day.type==='pull' ? 'PULL' : 'DIPS';
+    b.className=`day-tab ${day.workout}${day.id===activeDay?' active':''}`;
+    b.innerHTML=`<span class="dot"></span>${dayLabel}`;
+    b.title=`${day.label} - ${WORKOUT_LABELS[day.workout]}`;
     b.ontouchend=()=>{activeDay=day.id;setActiveDayForWeek(selectedWeekKey,day.id);renderLog();};
     c.appendChild(b);
   });
@@ -504,8 +506,6 @@ function renderLog(){
       </div>
       <button class="reset-btn" ontouchend="completeWeekAndAdvance()" onclick="completeWeekAndAdvance()" ${weekReady?'':'disabled'} style="margin-top:12px;${weekReady?'border-color:var(--pull);color:var(--pull);':'opacity:0.45;cursor:not-allowed;'}">${weekReady?'COMPLETE WEEK & START NEXT':'FINISH SAT LADDER (ALL 5 SETS) TO ADVANCE'}</button>
     </div>`;
-  const today=getToday();
-  document.getElementById('todayLabel').textContent=today<6?DAYS[today].name:'REST';
   const versionBadge = document.getElementById('versionBadge');
   if(versionBadge) versionBadge.textContent='BUILD ' + APP_VERSION;
   const weekNum = getWeekNumber(mondayDate(selectedWeekKey));
