@@ -250,7 +250,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.5';
+const APP_VERSION='2026.04.10.7';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -421,6 +421,25 @@ function weekTotals(weekData){
   return{pull,dip};
 }
 function getToday(){return(new Date().getDay()+6)%7;}
+function isLadderSetLogged(dayData,setIdx){
+  const rungs=dayData[`set_${setIdx}`]||[];
+  return rungs.some(r=>!r.failed && (r.reps||0)>0);
+}
+function isWeekReadyToComplete(weekData){
+  const regularDaysDone=DAYS.filter(d=>d.id!==5).every(d=>dayTotal(weekData,d.id)>0);
+  if(!regularDaysDone) return false;
+  const satData=weekData[5]||{};
+  const satDay=DAYS[5];
+  for(let s=0;s<satDay.sets;s++){
+    if(!isLadderSetLogged(satData,s)) return false;
+  }
+  return true;
+}
+function nextWeekKey(weekKey){
+  const d=mondayDate(weekKey);
+  d.setDate(d.getDate()+7);
+  return mondayStr(d);
+}
 
 // ?? LOG VIEW ??????????????????????????????????????????????????????????????????
 let activeDay=getActiveDayForWeek(selectedWeekKey);
@@ -469,6 +488,7 @@ function renderLog(){
   renderTabs();
   const day=DAYS[activeDay],ds=dayState(state,activeDay);
   const type=day.type,tot=dayTotal(state,activeDay),wt=weekTotals(state);
+  const weekReady=isWeekReadyToComplete(state);
   const setsHtml=day.workout==='ladder'?renderLadderSets(day,ds,type):renderStdSets(day,ds,type);
   document.getElementById('content').innerHTML=`
     <div><div class="workout-title ${type}">${type==='pull'?'PULL UPS':'DIPS'}</div><div class="workout-subtitle">${WORKOUT_LABELS[day.workout]}</div></div>
@@ -482,6 +502,7 @@ function renderLog(){
         <div class="week-stat"><div class="label">PULL UPS</div><div class="val pull">${wt.pull}</div></div>
         <div class="week-stat"><div class="label">DIPS</div><div class="val dip">${wt.dip}</div></div>
       </div>
+      <button class="reset-btn" ontouchend="completeWeekAndAdvance()" onclick="completeWeekAndAdvance()" ${weekReady?'':'disabled'} style="margin-top:12px;${weekReady?'border-color:var(--pull);color:var(--pull);':'opacity:0.45;cursor:not-allowed;'}">${weekReady?'COMPLETE WEEK & START NEXT':'FINISH SAT LADDER (ALL 5 SETS) TO ADVANCE'}</button>
     </div>`;
   const today=getToday();
   document.getElementById('todayLabel').textContent=today<6?DAYS[today].name:'REST';
@@ -556,6 +577,17 @@ function resetWeek(){
   history[selectedWeekKey]={};
   state=history[selectedWeekKey];
   saveHistory(history);
+  renderLog();
+}
+function completeWeekAndAdvance(){
+  if(!isWeekReadyToComplete(state)){
+    alert('Complete all workout days and finish Saturday ladder in all 5 sets before starting the next week.');
+    return;
+  }
+  const nextKey=nextWeekKey(selectedWeekKey);
+  if(!history[nextKey]) history[nextKey]={};
+  setSelectedWeek(nextKey);
+  setActiveDayForWeek(nextKey,0);
   renderLog();
 }
 
