@@ -46,7 +46,7 @@
   .workout-title.dip {color:var(--dip);}
   .workout-subtitle{font-size:0.58rem;color:var(--muted2);letter-spacing:2px;margin-top:3px;margin-bottom:18px;}
 
-  .totals-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+  .totals-bar{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:20px;}
   .total-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
   .total-card .label{font-size:0.56rem;color:var(--muted2);letter-spacing:2px;margin-bottom:3px;}
   .total-card .number{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:2px;line-height:1;}
@@ -68,10 +68,9 @@
   .rep-btn:first-child{border-radius:6px 0 0 6px;}
   .rep-btn:last-child {border-radius:0 6px 6px 0;}
   .rep-btn:active{background:var(--border);}
-  .done-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:1rem;line-height:1;cursor:pointer;transition:background .1s;margin-left:6px;}
+  .done-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:1px;line-height:1;cursor:pointer;transition:background .1s;margin-left:6px;flex-shrink:0;}
   .done-btn:active{background:var(--border);}
   .rep-prev{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--muted);padding:4px 0;min-width:56px;}
-  .done-btn{width:100%;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:1px;line-height:1;}
   .set-done{opacity:0.85;border-color:var(--pull);box-shadow:0 0 0 1px rgba(200,245,90,0.2);}
   .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
   .rep-value.pull{color:var(--pull);}
