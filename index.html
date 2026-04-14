@@ -9,6 +9,7 @@
   :root {
     --bg:#0d0d0d; --surface:#161616; --surface2:#1e1e1e;
     --border:#2a2a2a; --pull:#b2d8b2; --dip:#f0f0f0;
+    --max-day:#ff8a65; --submax-day:#4fc3f7; --ladder-day:#ffd54f;
     --text:#f0f0f0; --muted:#444; --muted2:#777;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -20,7 +21,6 @@
   h1{font-family:'Bebas Neue',sans-serif;font-size:2.1rem;letter-spacing:5px;line-height:1;}
   .week-label{font-size:0.56rem;color:var(--muted2);letter-spacing:2px;}
   .build-label{font-size:0.5rem;color:var(--muted2);letter-spacing:2px;margin-top:3px;}
-  #todayLabel{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;}
   .version-badge{margin-top:3px;font-size:0.5rem;color:var(--muted2);letter-spacing:1px;}
 
   /* NAV */
@@ -32,26 +32,30 @@
   .day-tabs{display:flex;overflow-x:auto;gap:4px;padding:14px 20px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-bottom:1px solid var(--border);}
   .day-tabs::-webkit-scrollbar{display:none;}
   .day-tab{flex-shrink:0;padding:7px 12px;border:1px solid var(--border);border-bottom:none;background:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:1px;cursor:pointer;border-radius:4px 4px 0 0;transition:all .12s;}
-  .day-tab.pull{border-top:2px solid var(--pull);}
-  .day-tab.dip {border-top:2px solid var(--dip);}
+  .day-tab.max{border-top:2px solid var(--max-day);}
+  .day-tab.volume{border-top:2px solid var(--submax-day);}
+  .day-tab.ladder{border-top:2px solid var(--ladder-day);}
   .day-tab.active{background:var(--surface);color:var(--text);}
   .day-tab .dot{display:inline-block;width:5px;height:5px;border-radius:50%;margin-right:5px;vertical-align:middle;}
-  .day-tab.pull .dot{background:var(--pull);}
-  .day-tab.dip  .dot{background:var(--dip);}
+  .day-tab.max .dot{background:var(--max-day);}
+  .day-tab.volume .dot{background:var(--submax-day);}
+  .day-tab.ladder .dot{background:var(--ladder-day);}
 
   /* CONTENT */
   .content{padding:18px 20px;}
   .workout-title{font-family:'Bebas Neue',sans-serif;font-size:2.7rem;letter-spacing:3px;line-height:1;}
-  .workout-title.pull{color:var(--pull);}
-  .workout-title.dip {color:var(--dip);}
+  .workout-title.max{color:var(--max-day);}
+  .workout-title.volume{color:var(--submax-day);}
+  .workout-title.ladder{color:var(--ladder-day);}
   .workout-subtitle{font-size:0.58rem;color:var(--muted2);letter-spacing:2px;margin-top:3px;margin-bottom:18px;}
 
   .totals-bar{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:20px;}
   .total-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
   .total-card .label{font-size:0.56rem;color:var(--muted2);letter-spacing:2px;margin-bottom:3px;}
   .total-card .number{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:2px;line-height:1;}
-  .total-card.pull .number{color:var(--pull);}
-  .total-card.dip  .number{color:var(--dip);}
+  .total-card.max .number{color:var(--max-day);}
+  .total-card.volume .number{color:var(--submax-day);}
+  .total-card.ladder .number{color:var(--ladder-day);}
 
   /* SETS */
   .sets-container{display:flex;flex-direction:column;gap:10px;}
@@ -73,12 +77,14 @@
   .rep-prev{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--muted);padding:4px 0;min-width:56px;}
   .set-done{opacity:0.85;border-color:var(--pull);box-shadow:0 0 0 1px rgba(200,245,90,0.2);}
   .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
-  .rep-value.pull{color:var(--pull);}
-  .rep-value.dip {color:var(--dip);}
+  .rep-value.max{color:var(--max-day);}
+  .rep-value.volume{color:var(--submax-day);}
+  .rep-value.ladder{color:var(--ladder-day);}
   .rep-value.zero{color:var(--muted);}
   .rep-value-input{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);border-left:none;border-right:none;padding:4px 0;min-width:56px;color:var(--text);outline:none;appearance:textfield;-moz-appearance:textfield;}
-  .rep-value-input.pull{color:var(--pull);}
-  .rep-value-input.dip {color:var(--dip);}
+  .rep-value-input.max{color:var(--max-day);}
+  .rep-value-input.volume{color:var(--submax-day);}
+  .rep-value-input.ladder{color:var(--ladder-day);}
   .rep-value-input.zero{color:var(--muted);}
   .rep-value-input::-webkit-outer-spin-button,
   .rep-value-input::-webkit-inner-spin-button{appearance:none;margin:0;}
@@ -88,8 +94,9 @@
   .rung-row{display:flex;align-items:center;gap:8px;}
   .rung-num{font-size:0.56rem;color:var(--muted2);width:46px;letter-spacing:1px;flex-shrink:0;}
   .rung-toggle{flex:1;height:30px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;user-select:none;}
-  .rung-toggle.done.pull{background:rgba(178,216,178,.08);border-color:var(--pull);color:var(--pull);}
-  .rung-toggle.done.dip {background:rgba(240,240,240,.08);border-color:var(--dip); color:var(--dip);}
+  .rung-toggle.done.max{background:rgba(255,138,101,.08);border-color:var(--max-day);color:var(--max-day);}
+  .rung-toggle.done.volume{background:rgba(79,195,247,.08);border-color:var(--submax-day);color:var(--submax-day);}
+  .rung-toggle.done.ladder{background:rgba(255,213,79,.08);border-color:var(--ladder-day);color:var(--ladder-day);}
   .rung-toggle.failed{background:rgba(170,170,170,.05);border-color:#aaaaaa33;color:#aaaaaa55;text-decoration:line-through;}
   .add-rung-btn{width:100%;height:28px;border:1px dashed var(--border);border-radius:6px;background:none;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:1px;cursor:pointer;transition:all .12s;margin-top:3px;}
   .add-rung-btn:hover{border-color:var(--text);color:var(--text);}
@@ -114,12 +121,17 @@
 
   .week-picker-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;}
   .week-picker-card label{display:block;font-size:0.56rem;color:var(--muted2);letter-spacing:2px;margin-bottom:8px;}
-  .week-picker-card input[type=date]{
-    width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;
+  .week-picker-card input[type=date],
+  .week-picker-card input[type=number],
+  .week-picker-card select{
+    width:100%;max-width:100%;display:block;min-width:0;
+    background:var(--surface2);border:1px solid var(--border);border-radius:6px;
     color:var(--text);font-family:'DM Mono',monospace;font-size:0.75rem;padding:9px 12px;
     letter-spacing:1px;outline:none;
   }
-  .week-picker-card input[type=date]:focus{border-color:var(--muted2);}
+  .week-picker-card input[type=date]:focus,
+  .week-picker-card input[type=number]:focus,
+  .week-picker-card select:focus{border-color:var(--muted2);}
   .week-resolved{margin-top:10px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:3px;color:var(--muted2);}
   .week-resolved span{color:var(--text);}
 
@@ -163,8 +175,8 @@
   .progress-subtitle{font-size:0.58rem;color:var(--muted2);letter-spacing:2px;margin-bottom:16px;}
   .type-toggle{display:flex;gap:8px;margin-bottom:18px;}
   .type-btn{flex:1;padding:9px;border:1px solid var(--border);background:none;font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;transition:all .12s;color:var(--muted2);}
-  .type-btn.active.pull{background:rgba(178,216,178,.1);border-color:var(--pull);color:var(--pull);}
-  .type-btn.active.dip {background:rgba(240,240,240,.1);border-color:var(--dip); color:var(--dip);}
+  .type-btn.active.pull{background:rgba(79,195,247,.1);border-color:var(--submax-day);color:var(--submax-day);}
+  .type-btn.active.dip {background:rgba(255,138,101,.1);border-color:var(--max-day); color:var(--max-day);}
   .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px;margin-bottom:13px;}
   .chart-title{font-size:0.56rem;color:var(--muted2);letter-spacing:2px;margin-bottom:13px;}
 
@@ -176,16 +188,16 @@
   .hw-label{font-size:0.58rem;color:var(--muted2);letter-spacing:1px;}
   .hw-current{font-size:0.48rem;color:var(--muted2);letter-spacing:1px;margin-top:2px;}
   .hw-total{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:2px;}
-  .hw-total.pull{color:var(--pull);}
-  .hw-total.dip {color:var(--dip);}
+  .hw-total.pull{color:var(--submax-day);}
+  .hw-total.dip {color:var(--max-day);}
   .hw-body{padding:0 14px 10px;display:none;}
   .hw-body.open{display:block;}
   .hw-day-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.58rem;}
   .hw-day-row:last-child{border-bottom:none;}
   .hw-day-name{color:var(--muted2);letter-spacing:1px;}
   .hw-day-val{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;}
-  .hw-day-val.pull{color:var(--pull);}
-  .hw-day-val.dip {color:var(--dip);}
+  .hw-day-val.pull{color:var(--submax-day);}
+  .hw-day-val.dip {color:var(--max-day);}
   .no-data{text-align:center;padding:34px 20px;color:var(--muted2);font-size:0.6rem;letter-spacing:2px;}
 
   /* TIMER */
@@ -193,8 +205,9 @@
   .timer-panel.active{display:flex;}
   .timer-info{font-size:0.63rem;color:var(--muted2);letter-spacing:3px;}
   .timer-display{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--text);min-width:50px;}
-  .timer-display.pull{color:var(--pull);}
-  .timer-display.dip{color:var(--dip);}
+  .timer-display.max{color:var(--max-day);}
+  .timer-display.volume{color:var(--submax-day);}
+  .timer-display.ladder{color:var(--ladder-day);}
   .timer-skip{padding:8px 16px;border:1px solid var(--border);background:var(--surface2);color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.63rem;letter-spacing:2px;cursor:pointer;border-radius:6px;pointer-events:auto;}
 
 </style>
@@ -206,43 +219,28 @@
     <h1>REP JOURNAL</h1>
     <div class="week-label" id="weekLabel">-</div>
     <div class="version-badge" id="versionBadge">BUILD -</div>
-    <div class="build-label" id="buildLabel">BUILD -</div>
   </div>
   <div style="text-align:right">
-    <div style="font-size:.53rem;color:var(--muted2);letter-spacing:2px">TODAY</div>
-    <div id="todayLabel"></div>
     <button class="reset-btn" ontouchend="resetWeek()" style="font-size:0.5rem;margin-top:4px;">RESET WEEK</button>
   </div>
 </header>
 
 <div class="nav-bar">
   <button class="nav-btn active" id="navLog"      ontouchend="switchView('log')" onclick="switchView('log')">LOG</button>
-  <button class="nav-btn"        id="navPast"     ontouchend="switchView('past')" onclick="switchView('past')">HISTORY</button>
   <button class="nav-btn"        id="navProgress" ontouchend="switchView('progress')" onclick="switchView('progress')">PROGRESS</button>
 </div>
 
 <!-- LOG VIEW -->
 <div id="viewLog">
+  <div class="content" style="padding-bottom:0;">
+    <div class="week-picker-card" style="margin-bottom:10px;">
+      <label>ACTIVE LOGGING WEEK</label>
+      <select id="logWeekSelect" onchange="onLogWeekSelectChange()"></select>
+      <div class="week-resolved" id="logWeekResolved">—</div>
+    </div>
+  </div>
   <div class="day-tabs" id="dayTabs"></div>
   <div class="content"  id="content"></div>
-</div>
-
-<!-- HISTORY VIEW -->
-<div id="viewPast" style="display:none">
-  <div class="past-view">
-    <h2>HISTORY</h2>
-    <p>Pick any date within the week you want to log. Then select a day and enter your reps.</p>
-
-    <div class="week-picker-card">
-      <label>PICK ANY DATE IN THAT WEEK</label>
-      <input type="date" id="pastDateInput" onchange="onPastDateChange()">
-      <div class="week-resolved" id="pastWeekResolved">- SELECT A DATE ABOVE -</div>
-    </div>
-
-    <div class="past-day-tabs" id="pastDayTabs"></div>
-    <div id="pastSetsArea"></div>
-    <div class="save-toast" id="saveToast">SAVED</div>
-  </div>
 </div>
 
 <!-- PROGRESS VIEW -->
@@ -261,9 +259,10 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.03.10';
+const APP_VERSION='2026.04.10.18';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
-const BUILD_VERSION='v14';
+const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
+const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
 
 // ?? STORAGE ??????????????????????????????????????????????????????????????????
 function mondayStr(d=new Date()){
@@ -280,45 +279,107 @@ function fmtWeek(str){
 function fmtWeekShort(str){return mondayDate(str).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}).toUpperCase();}
 
 function getWeekNumber(d){
-  const START_DATE = new Date(2026, 2, 16); // 16 March 2026
-  const startMonday = mondayDate(mondayStr(START_DATE));
+  const startMonday = mondayDate(PROGRAM_START_WEEK_KEY);
   const weekMonday = mondayDate(mondayStr(d));
   const diffMs = weekMonday - startMonday;
   const weeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1;
   return Math.max(1, weeks);
 }
+function weekKeyFromNumber(weekNumber){
+  const n=Math.max(1,parseInt(weekNumber,10)||1);
+  const d=mondayDate(PROGRAM_START_WEEK_KEY);
+  d.setDate(d.getDate()+((n-1)*7));
+  return mondayStr(d);
+}
+function populateWeekSelect(selectedWeekNumber){
+  const sel=document.getElementById('logWeekSelect');
+  if(!sel) return;
+  const maxWeek=getWeekNumber(mondayDate(REAL_CURRENT_WEEK));
+  let html='';
+  for(let w=1;w<=maxWeek;w++){
+    html+=`<option value="${w}">WEEK ${w}</option>`;
+  }
+  sel.innerHTML=html;
+  sel.value=String(Math.min(selectedWeekNumber,maxWeek));
+}
 
 const HISTORY_KEY='repjournal_v3';
-const CURRENT_WEEK=mondayStr();
+const WEEK_PREF_KEY='repjournal_active_week';
+const ACTIVE_DAY_MAP_KEY='repjournal_active_day_by_week';
+const REAL_CURRENT_WEEK=mondayStr();
 
 function loadHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY))||{};}catch{return {};}}
 function saveHistory(h){localStorage.setItem(HISTORY_KEY,JSON.stringify(h));}
+function loadActiveDayMap(){try{return JSON.parse(localStorage.getItem(ACTIVE_DAY_MAP_KEY))||{};}catch{return {};}}
+function saveActiveDayMap(map){localStorage.setItem(ACTIVE_DAY_MAP_KEY,JSON.stringify(map));}
 
 let history=loadHistory();
-if(!history[CURRENT_WEEK])history[CURRENT_WEEK]={};
-let state=history[CURRENT_WEEK];
-function persist(){history[CURRENT_WEEK]=state;saveHistory(history);}
+let activeDayByWeek=loadActiveDayMap();
+Object.keys(history).forEach(weekKey=>{
+  if(weekKey < PROGRAM_START_WEEK_KEY) delete history[weekKey];
+});
+let selectedWeekKey = localStorage.getItem(WEEK_PREF_KEY) || REAL_CURRENT_WEEK;
+if(selectedWeekKey < PROGRAM_START_WEEK_KEY) selectedWeekKey = PROGRAM_START_WEEK_KEY;
+if(selectedWeekKey > REAL_CURRENT_WEEK) selectedWeekKey = REAL_CURRENT_WEEK;
+let state=history[selectedWeekKey]||{};
+function persist(){history[selectedWeekKey]=state;saveHistory(history);}
+saveHistory(history);
 
-const weeks = Object.keys(history).sort();
-const prevWeekKey = weeks.length > 0 && weeks.indexOf(CURRENT_WEEK) > 0 ? weeks[weeks.indexOf(CURRENT_WEEK) - 1] : null;
+function getPrevWeekKey(weekKey){
+  const weeks = getLoggedWeekKeys().filter(wk=>wk<weekKey);
+  return weeks.length?weeks[weeks.length-1]:null;
+}
 
 function getPrevSetReps(dayId, setIdx){
+  const prevWeekKey = getPrevWeekKey(selectedWeekKey);
   if(!prevWeekKey) return 0;
   const prevData = history[prevWeekKey] || {};
   const dayData = prevData[dayId] || {};
   return dayData[`set_${setIdx}`] || 0;
 }
 
-// ?? VIEW SWITCHING ????????????????????????????????????????????????????????????
+function fmtDateInput(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function clampLogDay(dayId){
+  const n=Number(dayId);
+  if(!Number.isInteger(n)) return 0;
+  return Math.max(0,Math.min(5,n));
+}
+function getActiveDayForWeek(weekKey){
+  if(activeDayByWeek[weekKey]===undefined){
+    activeDayByWeek[weekKey]=weekKey===REAL_CURRENT_WEEK?Math.min(getToday(),5):0;
+    saveActiveDayMap(activeDayByWeek);
+  }
+  return clampLogDay(activeDayByWeek[weekKey]);
+}
+function setActiveDayForWeek(weekKey,dayId){
+  activeDayByWeek[weekKey]=clampLogDay(dayId);
+  saveActiveDayMap(activeDayByWeek);
+}
+function setSelectedWeek(weekKey){
+  selectedWeekKey = weekKey > REAL_CURRENT_WEEK ? REAL_CURRENT_WEEK : weekKey;
+  state = history[selectedWeekKey]||{};
+  localStorage.setItem(WEEK_PREF_KEY, selectedWeekKey);
+  activeDay = getActiveDayForWeek(selectedWeekKey);
+}
+function onLogWeekSelectChange(){
+  const inp = document.getElementById('logWeekSelect');
+  if(!inp) return;
+  const weekNumber=Math.max(1,parseInt(inp.value,10)||1);
+  setSelectedWeek(weekKeyFromNumber(weekNumber));
+  renderLog();
+}
+
+// ── VIEW SWITCHING ────────────────────────────────────────────────────────────
 let currentView='log';
 function switchView(v){
   currentView=v;
-  ['log','past','progress'].forEach(n=>{
+  ['log','progress'].forEach(n=>{
     document.getElementById('view'+n.charAt(0).toUpperCase()+n.slice(1)).style.display=v===n?'':'none';
     document.getElementById('nav'+n.charAt(0).toUpperCase()+n.slice(1)).classList.toggle('active',v===n);
   });
   if(v==='progress') renderProgress();
-  if(v==='past') initPastView();
 }
 
 // ?? TIMER ?????????????????????????????????????????????????????????????????????
@@ -336,7 +397,7 @@ function startTimer(workoutType, dayId, setIdx, duration){
   
   const label = workoutType==='max'?'REST - NEXT SET':'volume'===workoutType?'REST - NEXT SET':'REST - NEXT RUNG';
   info.textContent = label;
-  disp.className = 'timer-display ' + (workoutType==='ladder'?'pull':(workoutType==='max'?'dip':'pull'));
+  disp.className = 'timer-display ' + workoutType;
   updateGlobalTimerDisplay();
   panel.classList.add('active');
   document.body.classList.add('timer-active');
@@ -380,47 +441,86 @@ function weekTotals(weekData){
   DAYS.forEach(d=>{const t=dayTotal(weekData,d.id);if(d.type==='pull')pull+=t;else dip+=t;});
   return{pull,dip};
 }
+function weekHasData(weekData){
+  const wt=weekTotals(weekData||{});
+  return (wt.pull+wt.dip)>0;
+}
+function getLoggedWeekKeys(){
+  return Object.keys(history).filter(wk=>weekHasData(history[wk]||{})).sort();
+}
 function getToday(){return(new Date().getDay()+6)%7;}
+function isLadderSetLogged(dayData,setIdx){
+  const rungs=dayData[`set_${setIdx}`]||[];
+  return rungs.some(r=>!r.failed && (r.reps||0)>0);
+}
+function isWeekReadyToComplete(weekData){
+  const regularDaysDone=DAYS.filter(d=>d.id!==5).every(d=>dayTotal(weekData,d.id)>0);
+  if(!regularDaysDone) return false;
+  const satData=weekData[5]||{};
+  const satDay=DAYS[5];
+  for(let s=0;s<satDay.sets;s++){
+    if(!isLadderSetLogged(satData,s)) return false;
+  }
+  return true;
+}
+function nextWeekKey(weekKey){
+  const d=mondayDate(weekKey);
+  d.setDate(d.getDate()+7);
+  return mondayStr(d);
+}
+function workoutVar(workout){
+  if(workout==='max') return 'max-day';
+  if(workout==='volume') return 'submax-day';
+  return 'ladder-day';
+}
 
 // ?? LOG VIEW ??????????????????????????????????????????????????????????????????
-let activeDay=Math.min(getToday(),5);
+let activeDay=getActiveDayForWeek(selectedWeekKey);
 
 function renderTabs(){
-  const today=getToday(),c=document.getElementById('dayTabs');
+  const c=document.getElementById('dayTabs');
   c.innerHTML='';
   DAYS.forEach(day=>{
     const b=document.createElement('button');
-    b.className=`day-tab ${day.type}${day.id===activeDay?' active':''}`;
-    b.innerHTML=`<span class="dot"></span>${day.name}${day.id===today?' *':''}`;
-    b.ontouchend=()=>{activeDay=day.id;renderLog();};
+    const dayLabel = day.type==='pull' ? 'PULL' : 'DIPS';
+    b.className=`day-tab ${day.workout}${day.id===activeDay?' active':''}`;
+    b.innerHTML=`<span class="dot"></span>${dayLabel}`;
+    b.title=`${day.label} - ${WORKOUT_LABELS[day.workout]}`;
+    b.ontouchend=()=>{activeDay=day.id;setActiveDayForWeek(selectedWeekKey,day.id);renderLog();};
     c.appendChild(b);
   });
 }
 
-function renderStdSets(day,ds,type){
+function renderStdSets(day,ds){
   let h='';
+  const workoutClass=day.workout;
+  const accent=workoutVar(day.workout);
   for(let s=0;s<day.sets;s++){
     const val = ds[`set_${s}`] !== undefined ? ds[`set_${s}`] : 0;
+    const kg = ds[`set_${s}_kg`] !== undefined ? ds[`set_${s}_kg`] : 0;
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
-    const cc = val === 0 ? 'zero' : type;
-    h+=`<div class="set-card${done?' set-done':''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" onclick="completeSet(${day.id},${s})">v</button></div></div></div>`;
+    const cc = val === 0 ? 'zero' : workoutClass;
+    h+=`<div class="set-card${done?` set-done ${workoutClass}`:''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${val}</span> REPS${kg>0?` · <span style="color:var(--${accent})">${kg}</span> KG`:''}</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="kg-wrap"><div class="kg-label">KG</div><input class="kg-input" type="number" min="0" step="0.5" inputmode="decimal" value="${kg||''}" oninput="setWeightValue(${day.id},${s},this,false)" onchange="setWeightValue(${day.id},${s},this,true)" onblur="setWeightValue(${day.id},${s},this,true)"></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})" onclick="completeSet(${day.id},${s})">v</button></div></div></div>`;
   }
   return h;
 }
 
-function renderLadderSets(day,ds,type){
+function renderLadderSets(day,ds){
   let h='';
+  const workoutClass=day.workout;
+  const accent=workoutVar(day.workout);
   for(let s=0;s<day.sets;s++){
     const rungs=ds[`set_${s}`]||[];
+    const kg = ds[`set_${s}_kg`] !== undefined ? ds[`set_${s}_kg`] : 0;
     const setTot=rungs.reduce((a,r)=>a+(r.failed?0:r.reps),0);
     let rh='';
     rungs.forEach((r,ri)=>{
-      const sc=r.failed?'failed':(r.done?`done ${type}`:'');
+      const sc=r.failed?'failed':(r.done?`done ${workoutClass}`:'');
       const ic=r.failed?'x':(r.done?'v':'o');
       rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}x)</div><button class="rung-toggle ${sc}" onclick="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchend="failRung(${day.id},${s},${ri})">x</button></div>`;
     });
-    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${type})">${setTot}</span> REPS</div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" onclick="addRung(${day.id},${s},'${type}')">+ ADD NEXT RUNG</button></div></div>`;
+    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${setTot}</span> REPS${kg>0?` · <span style="color:var(--${accent})">${kg}</span> KG`:''}</div></div><div class="ladder-rungs"><div class="rep-input-row"><div class="rep-label">KG</div><div class="kg-wrap"><div class="kg-label">LOAD</div><input class="kg-input" type="number" min="0" step="0.5" inputmode="decimal" value="${kg||''}" oninput="setWeightValue(${day.id},${s},this,false)" onchange="setWeightValue(${day.id},${s},this,true)" onblur="setWeightValue(${day.id},${s},this,true)"></div></div>${rh}<button class="add-rung-btn" onclick="addRung(${day.id},${s},'${workoutClass}')">+ ADD NEXT RUNG</button></div></div>`;
   }
   return h;
 }
@@ -428,12 +528,13 @@ function renderLadderSets(day,ds,type){
 function renderLog(){
   renderTabs();
   const day=DAYS[activeDay],ds=dayState(state,activeDay);
-  const type=day.type,tot=dayTotal(state,activeDay),wt=weekTotals(state);
-  const setsHtml=day.workout==='ladder'?renderLadderSets(day,ds,type):renderStdSets(day,ds,type);
+  const type=day.type,workoutClass=day.workout,accent=workoutVar(day.workout),tot=dayTotal(state,activeDay),wt=weekTotals(state);
+  const weekReady=isWeekReadyToComplete(state);
+  const setsHtml=day.workout==='ladder'?renderLadderSets(day,ds):renderStdSets(day,ds);
   document.getElementById('content').innerHTML=`
-    <div><div class="workout-title ${type}">${type==='pull'?'PULL UPS':'DIPS'}</div><div class="workout-subtitle">${WORKOUT_LABELS[day.workout]}</div></div>
+    <div><div class="workout-title ${workoutClass}">${type==='pull'?'PULL UPS':'DIPS'}</div><div class="workout-subtitle">${WORKOUT_LABELS[day.workout]}</div></div>
     <div class="totals-bar">
-      <div class="total-card ${type}"><div class="label">TODAY</div><div class="number">${tot}</div></div>
+      <div class="total-card ${workoutClass}"><div class="label">TODAY</div><div class="number">${tot}</div></div>
     </div>
     <div class="sets-container">${setsHtml}</div>
     <div class="week-summary">
@@ -442,15 +543,18 @@ function renderLog(){
         <div class="week-stat"><div class="label">PULL UPS</div><div class="val pull">${wt.pull}</div></div>
         <div class="week-stat"><div class="label">DIPS</div><div class="val dip">${wt.dip}</div></div>
       </div>
+      <button class="reset-btn" ontouchend="completeWeekAndAdvance()" onclick="completeWeekAndAdvance()" ${weekReady?'':'disabled'} style="margin-top:12px;${weekReady?`border-color:var(--${accent});color:var(--${accent});`:'opacity:0.45;cursor:not-allowed;'}">${weekReady?'COMPLETE WEEK & START NEXT':'FINISH SAT LADDER (ALL 5 SETS) TO ADVANCE'}</button>
     </div>`;
-  const today=getToday();
-  document.getElementById('todayLabel').textContent=today<6?DAYS[today].name:'REST';
   const versionBadge = document.getElementById('versionBadge');
   if(versionBadge) versionBadge.textContent='BUILD ' + APP_VERSION;
-  const weekNum = getWeekNumber(mondayDate(CURRENT_WEEK));
-  document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(CURRENT_WEEK) + ')';
-  const buildLabel = document.getElementById('buildLabel');
-  if(buildLabel) buildLabel.textContent = 'BUILD ' + BUILD_VERSION;
+  const weekNum = getWeekNumber(mondayDate(selectedWeekKey));
+  const isCurrentWeek = selectedWeekKey === REAL_CURRENT_WEEK;
+  document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(selectedWeekKey) + ')' + (isCurrentWeek ? '' : ' - CUSTOM');
+  populateWeekSelect(weekNum);
+  const weekResolved = document.getElementById('logWeekResolved');
+  if(weekResolved){
+    weekResolved.innerHTML = `LOGGING IN <span>${fmtWeek(selectedWeekKey)}</span>`;
+  }
 }
 
 function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);if(ds[k]===0)ds[`${k}_done`]=false;persist();renderLog();}
@@ -459,11 +563,29 @@ function parseRepValue(value){
   if(!digits) return 0;
   return Math.max(0,parseInt(digits,10) || 0);
 }
+function parseWeightValue(value){
+  let cleaned=String(value??'').replace(/[^0-9.]/g,'');
+  const firstDot=cleaned.indexOf('.');
+  if(firstDot!==-1){
+    cleaned=cleaned.slice(0,firstDot+1)+cleaned.slice(firstDot+1).replace(/\./g,'');
+  }
+  if(cleaned.startsWith('.')) cleaned='0'+cleaned;
+  const n=parseFloat(cleaned);
+  if(!Number.isFinite(n) || n<=0) return 0;
+  return Math.min(300,Math.round(n*10)/10);
+}
 function normalizeRepInput(input){
   let digits=String(input.value??'').replace(/\D/g,'');
   if(digits.length>1) digits=digits.replace(/^0+/,'') || '0';
   if(input.value!==digits) input.value=digits;
   return digits;
+}
+function setWeightValue(dayId,si,input,rerender){
+  const ds=dayState(state,dayId),k=`set_${si}_kg`;
+  ds[k]=parseWeightValue(input.value);
+  input.value=ds[k]?String(ds[k]):'';
+  persist();
+  if(rerender) renderLog();
 }
 function setRepValue(dayId,si,input,rerender){
   const ds=dayState(state,dayId),k=`set_${si}`;
@@ -501,181 +623,23 @@ function failRung(dayId,si,ri){
   persist();
   renderLog();
 }
-function resetWeek(){if(!confirm('Reset all data for this week?'))return;history[CURRENT_WEEK]={};state=history[CURRENT_WEEK];saveHistory(history);renderLog();}
-
-// ?? ADD PAST VIEW ?????????????????????????????????????????????????????????????
-let pastWeekKey = null;   // currently selected past week key
-let pastActiveDay = 0;    // currently selected day in past entry
-// Transient state for the past entry form (per day)
-// pastFormData[weekKey][dayId][setIdx] = reps  (for std/volume)
-// pastFormData[weekKey][dayId][setIdx] = [{reps}] (for ladder)
-let pastFormData = {};
-
-function initPastView(){
-  // Set default date to 7 days ago
-  const def = new Date(); def.setDate(def.getDate()-7);
-  const inp = document.getElementById('pastDateInput');
-  if(!inp.value){
-    inp.value = def.toISOString().split('T')[0];
-    onPastDateChange();
-  }
+function resetWeek(){
+  if(!confirm(`Reset all data for week of ${fmtWeek(selectedWeekKey)}?`))return;
+  history[selectedWeekKey]={};
+  state=history[selectedWeekKey];
+  saveHistory(history);
+  renderLog();
 }
-
-function onPastDateChange(){
-  const inp = document.getElementById('pastDateInput');
-  if(!inp.value) return;
-  const chosen = new Date(inp.value + 'T00:00:00');
-  pastWeekKey = mondayStr(chosen);
-  // Don't allow editing current week here
-  if(pastWeekKey === CURRENT_WEEK){
-    document.getElementById('pastWeekResolved').innerHTML =
-      `<span style="color:#ff6b35">THAT'S THE CURRENT WEEK - USE THE LOG TAB</span>`;
-    document.getElementById('pastDayTabs').innerHTML='';
-    document.getElementById('pastSetsArea').innerHTML='';
+function completeWeekAndAdvance(){
+  if(!isWeekReadyToComplete(state)){
+    alert('Complete all workout days and finish Saturday ladder in all 5 sets before starting the next week.');
     return;
   }
-  document.getElementById('pastWeekResolved').innerHTML =
-    `WEEK OF <span>${fmtWeek(pastWeekKey)}</span>`;
-  // Pre-load existing history into form data if present
-  if(!pastFormData[pastWeekKey]){
-    pastFormData[pastWeekKey] = {};
-    // Copy existing saved data into form
-    const existing = history[pastWeekKey] || {};
-    DAYS.forEach(day=>{
-      pastFormData[pastWeekKey][day.id] = JSON.parse(JSON.stringify(existing[day.id]||{}));
-    });
-  }
-  pastActiveDay = 0;
-  renderPastDayTabs();
-  renderPastSets();
-}
-
-function renderPastDayTabs(){
-  const c=document.getElementById('pastDayTabs');
-  c.innerHTML='';
-  DAYS.forEach(day=>{
-    const b=document.createElement('button');
-    b.className=`past-day-tab ${day.type}${day.id===pastActiveDay?' active':''}`;
-    b.innerHTML=`<span class="dot"></span>${day.name}`;
-    b.ontouchend=()=>{pastActiveDay=day.id;renderPastDayTabs();renderPastSets();};
-    c.appendChild(b);
-  });
-}
-
-function renderPastSets(){
-  if(!pastWeekKey) return;
-  const day=DAYS[pastActiveDay];
-  const type=day.type;
-  const fd=pastFormData[pastWeekKey][pastActiveDay]||{};
-  const area=document.getElementById('pastSetsArea');
-
-  if(day.workout==='ladder'){
-    // Ladder: show sets, each set has a list of rungs with reps fields
-    let h=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;">
-      <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--muted2)">LADDER SETS</div>
-        <div style="font-size:0.55rem;color:var(--muted2);letter-spacing:1px;">ENTER MAX RUNG REACHED PER SET</div>
-      </div>`;
-    for(let s=0;s<day.sets;s++){
-      const rungs=fd[`set_${s}`]||[];
-      let rh='';
-      rungs.forEach((r,ri)=>{
-        rh+=`<div class="ladder-entry-row">
-          <div class="le-label">RUNG ${ri+1} (${ri+1} REP${ri+1>1?'S':''})</div>
-          <input type="number" min="0" value="${r.reps||ri+1}" readonly style="opacity:0.5;width:60px;flex:none;">
-          <button class="le-remove" ontouchend="pastRemoveRung(${s},${ri})">x</button>
-        </div>`;
-      });
-      const setTot = rungs.reduce((a,r)=>a+r.reps,0);
-      h+=`<div style="border-bottom:1px solid var(--border);padding-bottom:4px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px 4px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:2px;color:var(--muted2)">SET ${s+1}</div>
-          <div style="font-size:0.6rem;color:var(--muted2)"><span style="font-family:'Bebas Neue',sans-serif;font-size:0.9rem;color:var(--${type})">${setTot}</span> REPS</div>
-        </div>
-        ${rh}
-        <button class="add-ladder-rung-btn" ontouchend="pastAddRung(${s})">+ ADD RUNG (${rungs.length+1} REPS)</button>
-      </div>`;
-    }
-    h+=`</div>`;
-    area.innerHTML = h + saveBtnHtml(type);
-  } else {
-    // Max / Volume: simple +/- per set
-    let h='<div class="past-sets-area">';
-    for(let s=0;s<day.sets;s++){
-      const val=fd[`set_${s}`]||0,cc=val===0?'zero':type;
-      h+=`<div class="set-card">
-        <div class="set-header">
-          <div class="set-number">SET ${s+1}</div>
-          <div class="set-total"><span style="color:var(--${type})">${val}</span> REPS</div>
-        </div>
-        <div class="set-body">
-          <div class="rep-input-row">
-            <div class="rep-label">REPS</div>
-            <div class="rep-controls">
-              <button class="rep-btn" ontouchend="pastChRep(${s},-1)">-</button>
-              <input class="rep-value-input ${cc}" id="past_rep_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" oninput="setPastRepValue(${s},this,false)" onchange="setPastRepValue(${s},this,true)" onblur="setPastRepValue(${s},this,true)">
-              <button class="rep-btn" ontouchend="pastChRep(${s},1)">+</button>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    }
-    h+='</div>';
-    area.innerHTML = h + saveBtnHtml(type);
-  }
-}
-
-function saveBtnHtml(type){
-  return `<button class="save-past-btn ${type}" ontouchend="savePastDay()" style="margin-top:14px">SAVE THIS DAY ></button>
-          <div class="save-toast" id="saveToast"></div>`;
-}
-
-function pastChRep(si,delta){
-  if(!pastWeekKey) return;
-  const fd=pastFormData[pastWeekKey][pastActiveDay];
-  const k=`set_${si}`;
-  fd[k]=Math.max(0,(fd[k]||0)+delta);
-  renderPastSets();
-}
-function setPastRepValue(si,input,rerender){
-  if(!pastWeekKey) return;
-  const fd=pastFormData[pastWeekKey][pastActiveDay];
-  const k=`set_${si}`;
-  fd[k]=parseRepValue(normalizeRepInput(input));
-  if(rerender) renderPastSets();
-}
-function pastPromptRep(si){
-  const input=document.getElementById(`past_rep_${si}`);
-  if(!input) return;
-  input.focus();
-  input.select();
-}
-function pastAddRung(si){
-  if(!pastWeekKey) return;
-  const fd=pastFormData[pastWeekKey][pastActiveDay];
-  const k=`set_${si}`;
-  if(!fd[k])fd[k]=[];
-  const rungs=fd[k];
-  rungs.push({reps:rungs.length+1,done:true,failed:false});
-  renderPastSets();
-}
-function pastRemoveRung(si,ri){
-  if(!pastWeekKey) return;
-  const fd=pastFormData[pastWeekKey][pastActiveDay];
-  const k=`set_${si}`;
-  if(fd[k])fd[k].splice(ri,1);
-  renderPastSets();
-}
-function savePastDay(){
-  if(!pastWeekKey) return;
-  if(!history[pastWeekKey]) history[pastWeekKey]={};
-  // Copy this day's form data into history
-  history[pastWeekKey][pastActiveDay] = JSON.parse(JSON.stringify(pastFormData[pastWeekKey][pastActiveDay]));
-  saveHistory(history);
-  const toast=document.getElementById('saveToast');
-  toast.textContent=`SAVED ${DAYS[pastActiveDay].label}`;
-  toast.className='save-toast show';
-  setTimeout(()=>toast.className='save-toast',2000);
+  const nextKey=nextWeekKey(selectedWeekKey);
+  if(!history[nextKey]) history[nextKey]={};
+  setSelectedWeek(nextKey);
+  setActiveDayForWeek(nextKey,0);
+  renderLog();
 }
 
 // ?? PROGRESS VIEW ?????????????????????????????????????????????????????????????
@@ -685,21 +649,25 @@ function toggleHistWeek(el){el.nextElementSibling.classList.toggle('open');}
 
 function renderProgress(){
   const pc=document.getElementById('progressContent');
-  const weeks=Object.keys(history).sort();
+  const weeks=getLoggedWeekKeys();
   const type=progressType;
-  const color='#b2d8b2';
-  const colorA='rgba(178,216,178,.12)';
+  const color=type==='pull'?'#4fc3f7':'#ff8a65';
+  const colorA=type==='pull'?'rgba(79,195,247,.14)':'rgba(255,138,101,.14)';
   const wkLabels=[],wkTotals=[];
   weeks.forEach(wk=>{wkLabels.push(fmtWeekShort(wk));const wt=weekTotals(history[wk]||{});wkTotals.push(type==='pull'?wt.pull:wt.dip);});
   const typeDays=DAYS.filter(d=>d.type===type);
-  const palette=['#f0f0f0','#cccccc','#aaaaaa'];
+  const workoutColorMap={max:'#ff8a65',volume:'#4fc3f7',ladder:'#ffd54f'};
   const dayDatasets=typeDays.map((day,i)=>({
     label: WORKOUT_LABELS[day.workout].split(' - ')[0],
-    data:weeks.map(wk=>dayTotal(history[wk]||{},day.id)),
-    borderColor:palette[i%palette.length],
+    data:weeks.map(wk=>{
+      const reps=dayTotal(history[wk]||{},day.id);
+      return reps>0?reps:null;
+    }),
+    borderColor:workoutColorMap[day.workout],
     backgroundColor:'transparent',
-    tension:0.35,pointRadius:4,
-    pointBackgroundColor:palette[i%palette.length],
+    tension:0,pointRadius:4,
+    spanGaps:false,
+    pointBackgroundColor:workoutColorMap[day.workout],
     borderWidth:2,
   }));
 
@@ -707,11 +675,11 @@ function renderProgress(){
   if(weeks.length===0){histHtml='<div class="no-data">NO DATA YET - START LOGGING!</div>';}
   else{
     [...weeks].reverse().forEach(wk=>{
-      const wd=history[wk]||{},wt=weekTotals(wd),tot=type==='pull'?wt.pull:wt.dip,isCur=wk===CURRENT_WEEK;
+      const wd=history[wk]||{},wt=weekTotals(wd),tot=type==='pull'?wt.pull:wt.dip,isCur=wk===selectedWeekKey;
       let typeSets = {};
       DAYS.filter(d=>d.type===type).forEach(day=>{
         const dayTypeLabel = day.workout === 'max' ? 'Max Days' : day.workout === 'volume' ? 'Sub Max Volume' : 'Ladder Volume';
-        if(!typeSets[dayTypeLabel]) typeSets[dayTypeLabel] = [];
+        if(!typeSets[dayTypeLabel]) typeSets[dayTypeLabel] = {values:[], accent:workoutVar(day.workout)};
         for(let s=0; s<day.sets; s++){
           let setReps = 0;
           if(day.workout === 'ladder'){
@@ -721,17 +689,18 @@ function renderProgress(){
             setReps = wd[day.id]?.[`set_${s}`] || 0;
           }
           if(setReps > 0){
-            typeSets[dayTypeLabel].push(`${setReps}`);
+            typeSets[dayTypeLabel].values.push(`${setReps}`);
           }
         }
       });
       let drows = '';
       Object.keys(typeSets).forEach(typeLabel => {
-        if(typeSets[typeLabel].length > 0){
-          drows += `<div class="hw-day-row"><span class="hw-day-name">${typeLabel}</span><span class="hw-day-val ${type}">${typeSets[typeLabel].join(', ')}</span></div>`;
+        const series=typeSets[typeLabel];
+        if(series.values.length > 0){
+          drows += `<div class="hw-day-row"><span class="hw-day-name">${typeLabel}</span><span class="hw-day-val" style="color:var(--${series.accent})">${series.values.join(', ')}</span></div>`;
         }
       });
-      histHtml+=`<div class="history-week"><div class="hw-header" ontouchend="toggleHistWeek(this)"><div><div class="hw-label">${fmtWeek(wk)}</div>${isCur?'<div class="hw-current">CURRENT WEEK</div>':''}</div><div class="hw-total ${type}">${tot} <span style="font-size:.62rem;font-family:'DM Mono';color:var(--muted2)">REPS</span></div></div><div class="hw-body">${drows}</div></div>`;
+      histHtml+=`<div class="history-week"><div class="hw-header" ontouchend="toggleHistWeek(this)"><div><div class="hw-label">${fmtWeek(wk)}</div>${isCur?'<div class="hw-current">ACTIVE LOG WEEK</div>':''}</div><div class="hw-total ${type}">${tot} <span style="font-size:.62rem;font-family:'DM Mono';color:var(--muted2)">REPS</span></div></div><div class="hw-body">${drows}</div></div>`;
     });
   }
 
