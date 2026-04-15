@@ -259,7 +259,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.15.1';
+const APP_VERSION='2026.04.15.3';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -500,7 +500,7 @@ function renderStdSets(day,ds){
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : workoutClass;
-    h+=`<div class="set-card${done?` set-done ${workoutClass}`:''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})" onclick="completeSet(${day.id},${s})">v</button></div></div></div>`;
+    h+=`<div class="set-card${done?` set-done ${workoutClass}`:''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-workout="${workoutClass}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})" onclick="completeSet(${day.id},${s})">v</button></div></div></div>`;
   }
   return h;
 }
@@ -561,41 +561,29 @@ function parseRepValue(value){
   if(!digits) return 0;
   return Math.max(0,parseInt(digits,10) || 0);
 }
-function parseWeightValue(value){
-  let cleaned=String(value??'').replace(/[^0-9.]/g,'');
-  const firstDot=cleaned.indexOf('.');
-  if(firstDot!==-1){
-    cleaned=cleaned.slice(0,firstDot+1)+cleaned.slice(firstDot+1).replace(/\./g,'');
-  }
-  if(cleaned.startsWith('.')) cleaned='0'+cleaned;
-  const n=parseFloat(cleaned);
-  if(!Number.isFinite(n) || n<=0) return 0;
-  return Math.min(300,Math.round(n*10)/10);
-}
 function normalizeRepInput(input){
   let digits=String(input.value??'').replace(/\D/g,'');
   if(digits.length>1) digits=digits.replace(/^0+/,'') || '0';
   if(input.value!==digits) input.value=digits;
   return digits;
 }
-function setWeightValue(dayId,si,input,rerender){
-  const ds=dayState(state,dayId),k=`set_${si}_kg`;
-  ds[k]=parseWeightValue(input.value);
-  input.value=ds[k]?String(ds[k]):'';
-  persist();
-  if(rerender) renderLog();
-}
 function setRepValue(dayId,si,input,rerender){
   const ds=dayState(state,dayId),k=`set_${si}`;
   ds[k]=parseRepValue(normalizeRepInput(input));
   if(ds[k]===0)ds[`${k}_done`]=false;
+  const workoutClass=input?.dataset?.workout || '';
+  input.className = `rep-value-input ${ds[k]===0 ? 'zero' : workoutClass}`.trim();
   persist();
   if(rerender) renderLog();
 }
 function updateRepValueAndTimer(dayId,si,input){
   setRepValue(dayId,si,input,false);
-  const day=DAYS[dayId];
-  if(day) startTimer(day.workout, dayId, si);
+  const value = parseRepValue(input?.value);
+  if(value>0){
+    completeSet(dayId,si);
+  }else{
+    renderLog();
+  }
 }
 function promptRep(dayId,si){
   const input=document.querySelector(`[data-rep-input="${dayId}_${si}"]`);
