@@ -75,7 +75,10 @@
   .done-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:1px;line-height:1;cursor:pointer;transition:background .1s;margin-left:6px;flex-shrink:0;}
   .done-btn:active{background:var(--border);}
   .rep-prev{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;color:var(--muted);padding:4px 0;min-width:56px;}
-  .set-done{opacity:0.85;border-color:var(--pull);box-shadow:0 0 0 1px rgba(200,245,90,0.2);}
+  .set-done{opacity:0.9;}
+  .set-done.max{border-color:var(--max-day);box-shadow:0 0 0 1px rgba(255,138,101,0.28);}
+  .set-done.volume{border-color:var(--submax-day);box-shadow:0 0 0 1px rgba(79,195,247,0.28);}
+  .set-done.ladder{border-color:var(--ladder-day);box-shadow:0 0 0 1px rgba(255,213,79,0.30);}
   .rep-value{flex:1;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4px 0;min-width:56px;cursor:pointer;touch-action:manipulation;}
   .rep-value.max{color:var(--max-day);}
   .rep-value.volume{color:var(--submax-day);}
@@ -259,7 +262,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.15.3';
+const APP_VERSION='2026.04.15.4';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
