@@ -259,7 +259,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.10.18';
+const APP_VERSION='2026.04.15.1';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -497,11 +497,10 @@ function renderStdSets(day,ds){
   const accent=workoutVar(day.workout);
   for(let s=0;s<day.sets;s++){
     const val = ds[`set_${s}`] !== undefined ? ds[`set_${s}`] : 0;
-    const kg = ds[`set_${s}_kg`] !== undefined ? ds[`set_${s}_kg`] : 0;
     const prev = getPrevSetReps(day.id, s) || 0;
     const done = ds[`set_${s}_done`];
     const cc = val === 0 ? 'zero' : workoutClass;
-    h+=`<div class="set-card${done?` set-done ${workoutClass}`:''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${val}</span> REPS${kg>0?` · <span style="color:var(--${accent})">${kg}</span> KG`:''}</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="kg-wrap"><div class="kg-label">KG</div><input class="kg-input" type="number" min="0" step="0.5" inputmode="decimal" value="${kg||''}" oninput="setWeightValue(${day.id},${s},this,false)" onchange="setWeightValue(${day.id},${s},this,true)" onblur="setWeightValue(${day.id},${s},this,true)"></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})" onclick="completeSet(${day.id},${s})">v</button></div></div></div>`;
+    h+=`<div class="set-card${done?` set-done ${workoutClass}`:''}"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${val}</span> REPS</div></div><div class="set-body"><div class="rep-input-row"><div class="rep-label">REPS</div><div class="rep-controls"><button class="rep-btn" ontouchend="chRep(${day.id},${s},-1)">-</button><input class="rep-value-input ${cc}" data-rep-input="${day.id}_${s}" type="number" min="0" inputmode="numeric" pattern="[0-9]*" value="${val}" onfocus="promptRep(${day.id},${s})" oninput="setRepValue(${day.id},${s},this,false)" onchange="updateRepValueAndTimer(${day.id},${s},this)" onblur="updateRepValueAndTimer(${day.id},${s},this)" onkeydown="if(event.key==='Enter'){event.preventDefault();updateRepValueAndTimer(${day.id},${s},this)}"><button class="rep-btn" ontouchend="chRep(${day.id},${s},1)">+</button></div><div class="rep-prev">${prev}</div><span class="set-timer" id="setTimer_${day.id}_${s}"></span><button class="done-btn" ontouchend="completeSet(${day.id},${s})" onclick="completeSet(${day.id},${s})">v</button></div></div></div>`;
   }
   return h;
 }
@@ -512,7 +511,6 @@ function renderLadderSets(day,ds){
   const accent=workoutVar(day.workout);
   for(let s=0;s<day.sets;s++){
     const rungs=ds[`set_${s}`]||[];
-    const kg = ds[`set_${s}_kg`] !== undefined ? ds[`set_${s}_kg`] : 0;
     const setTot=rungs.reduce((a,r)=>a+(r.failed?0:r.reps),0);
     let rh='';
     rungs.forEach((r,ri)=>{
@@ -520,7 +518,7 @@ function renderLadderSets(day,ds){
       const ic=r.failed?'x':(r.done?'v':'o');
       rh+=`<div class="rung-row"><div class="rung-num">RUNG ${ri+1} (${r.reps}x)</div><button class="rung-toggle ${sc}" onclick="toggleRung(${day.id},${s},${ri})">${ic} ${r.reps} REP${r.reps>1?'S':''}</button><button class="fail-btn" ontouchend="failRung(${day.id},${s},${ri})">x</button></div>`;
     });
-    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${setTot}</span> REPS${kg>0?` · <span style="color:var(--${accent})">${kg}</span> KG`:''}</div></div><div class="ladder-rungs"><div class="rep-input-row"><div class="rep-label">KG</div><div class="kg-wrap"><div class="kg-label">LOAD</div><input class="kg-input" type="number" min="0" step="0.5" inputmode="decimal" value="${kg||''}" oninput="setWeightValue(${day.id},${s},this,false)" onchange="setWeightValue(${day.id},${s},this,true)" onblur="setWeightValue(${day.id},${s},this,true)"></div></div>${rh}<button class="add-rung-btn" onclick="addRung(${day.id},${s},'${workoutClass}')">+ ADD NEXT RUNG</button></div></div>`;
+    h+=`<div class="set-card"><div class="set-header"><div class="set-number">SET ${s+1}</div><div class="set-total"><span style="color:var(--${accent})">${setTot}</span> REPS</div></div><div class="ladder-rungs">${rh}<button class="add-rung-btn" onclick="addRung(${day.id},${s},'${workoutClass}')">+ ADD NEXT RUNG</button></div></div>`;
   }
   return h;
 }
