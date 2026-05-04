@@ -116,7 +116,17 @@
   .week-stat .val.dip {color:var(--dip);}
   .reset-btn{margin-top:14px;width:100%;padding:9px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted2);font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:2px;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent;}
   .reset-btn:hover{border-color:#aaaaaa;color:#aaaaaa;}
-
+  /* ?? AUXILIARY EXERCISES ?? */
+  .auxiliary-section{margin-top:22px;}
+  .auxiliary-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--muted2);margin-bottom:10px;}
+  .auxiliary-exercise{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;}
+  .exercise-name{font-size:0.65rem;color:var(--text);letter-spacing:1px;margin-bottom:8px;display:block;}
+  .auxiliary-sets{display:flex;gap:6px;flex-wrap:wrap;}
+  .auxiliary-set{flex:1;min-width:70px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px;display:flex;align-items:center;justify-content:center;}
+  .auxiliary-set input{flex:1;text-align:center;background:none;border:none;color:var(--text);font-family:'DM Mono',monospace;font-size:0.65rem;outline:none;appearance:textfield;-moz-appearance:textfield;min-width:40px;}
+  .auxiliary-set input::-webkit-outer-spin-button,
+  .auxiliary-set input::-webkit-inner-spin-button{appearance:none;margin:0;}
+  .auxiliary-set .unit{font-size:0.55rem;color:var(--muted2);margin-left:3px;letter-spacing:0.5px;}
   /* ?? PAST ENTRY VIEW ?? */
   .past-view{padding:18px 20px;}
   .past-view > h2{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:4px;margin-bottom:4px;}
@@ -262,7 +272,19 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.05.04.1';
+const AUXILIARY_EXERCISES={
+  pull:[
+    {id:'bicep_curls',name:'Bicep Curls',unit:'reps',sets:2},
+    {id:'hollow_body_holds',name:'Hollow Body Holds',unit:'seconds',sets:2},
+    {id:'bodyweight_squats',name:'Bodyweight Squats',unit:'reps',sets:2}
+  ],
+  dip:[
+    {id:'tricep_extensions',name:'Tricep Extensions',unit:'reps',sets:2},
+    {id:'hollow_body_holds',name:'Hollow Body Holds',unit:'seconds',sets:2},
+    {id:'bodyweight_squats',name:'Bodyweight Squats',unit:'reps',sets:2}
+  ]
+};
+const APP_VERSION='2026.05.04.2';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -534,18 +556,44 @@ function renderLadderSets(day,ds){
   return h;
 }
 
+function renderAuxiliaryExercises(day,ds){
+  const exercises=AUXILIARY_EXERCISES[day.type];
+  if(!exercises) return '';
+  let h='<div class="auxiliary-section"><div class="auxiliary-title">AUXILIARY</div>';
+  exercises.forEach(ex=>{
+    h+=`<div class="auxiliary-exercise"><span class="exercise-name">${ex.name}</span><div class="auxiliary-sets">`;
+    for(let s=0;s<ex.sets;s++){
+      const val=ds[`aux_${ex.id}_set_${s}`]||0;
+      h+=`<div class="auxiliary-set"><input type="number" min="0" inputmode="numeric" value="${val}" data-aux-exercise="${ex.id}" data-aux-set="${s}" onchange="setAuxiliaryValue(${day.id},'${ex.id}',${s},this)"><span class="unit">${ex.unit}</span></div>`;
+    }
+    h+='</div></div>';
+  });
+  h+='</div>';
+  return h;
+}
+
+function setAuxiliaryValue(dayId,exerciseId,setIdx,input){
+  const val=Math.max(0,parseInt(input.value,10)||0);
+  const ds=dayState(state,dayId);
+  ds[`aux_${exerciseId}_set_${setIdx}`]=val;
+  persist();
+  renderLog();
+}
+
 function renderLog(){
   renderTabs();
   const day=DAYS[activeDay],ds=dayState(state,activeDay);
   const type=day.type,workoutClass=day.workout,accent=workoutVar(day.workout),tot=dayTotal(state,activeDay),wt=weekTotals(state);
   const weekReady=isWeekReadyToComplete(state);
   const setsHtml=day.workout==='ladder'?renderLadderSets(day,ds):renderStdSets(day,ds);
+  const auxHtml=renderAuxiliaryExercises(day,ds);
   document.getElementById('content').innerHTML=`
     <div><div class="workout-title ${workoutClass}">${type==='pull'?'PULL UPS':'DIPS'}</div><div class="workout-subtitle">${WORKOUT_LABELS[day.workout]}</div></div>
     <div class="totals-bar">
       <div class="total-card ${workoutClass}"><div class="label">TODAY</div><div class="number">${tot}</div></div>
     </div>
     <div class="sets-container">${setsHtml}</div>
+    ${auxHtml}
     <div class="week-summary">
       <h2>WEEKLY TOTALS</h2>
       <div class="week-grid">
