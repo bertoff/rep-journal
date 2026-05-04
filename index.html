@@ -262,7 +262,7 @@ const DAYS = [
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
   {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
 ];
-const APP_VERSION='2026.04.15.4';
+const APP_VERSION='2026.05.04.1';
 const WORKOUT_LABELS={max:'MAX DAY - 3 x MAX REPS',volume:'SUB MAX VOLUME - 10 x VOLUME SETS',ladder:'LADDER VOLUME - 5 x LADDER SETS'};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
@@ -297,7 +297,8 @@ function weekKeyFromNumber(weekNumber){
 function populateWeekSelect(selectedWeekNumber){
   const sel=document.getElementById('logWeekSelect');
   if(!sel) return;
-  const maxWeek=getWeekNumber(mondayDate(REAL_CURRENT_WEEK));
+  const workingWeekNum=getWeekNumber(mondayDate(currentWorkingWeek));
+  const maxWeek=workingWeekNum+1;
   let html='';
   for(let w=1;w<=maxWeek;w++){
     html+=`<option value="${w}">WEEK ${w}</option>`;
@@ -309,6 +310,7 @@ function populateWeekSelect(selectedWeekNumber){
 const HISTORY_KEY='repjournal_v3';
 const WEEK_PREF_KEY='repjournal_active_week';
 const ACTIVE_DAY_MAP_KEY='repjournal_active_day_by_week';
+const WORKING_WEEK_KEY='repjournal_working_week';
 const REAL_CURRENT_WEEK=mondayStr();
 
 function loadHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY))||{};}catch{return {};}}
@@ -321,9 +323,15 @@ let activeDayByWeek=loadActiveDayMap();
 Object.keys(history).forEach(weekKey=>{
   if(weekKey < PROGRAM_START_WEEK_KEY) delete history[weekKey];
 });
-let selectedWeekKey = localStorage.getItem(WEEK_PREF_KEY) || REAL_CURRENT_WEEK;
+let currentWorkingWeek = localStorage.getItem(WORKING_WEEK_KEY);
+if(!currentWorkingWeek || currentWorkingWeek < PROGRAM_START_WEEK_KEY){
+  const loggedWeeks=Object.keys(history).sort();
+  currentWorkingWeek=loggedWeeks.length>0?loggedWeeks[loggedWeeks.length-1]:PROGRAM_START_WEEK_KEY;
+  localStorage.setItem(WORKING_WEEK_KEY,currentWorkingWeek);
+}
+let selectedWeekKey = localStorage.getItem(WEEK_PREF_KEY) || currentWorkingWeek;
 if(selectedWeekKey < PROGRAM_START_WEEK_KEY) selectedWeekKey = PROGRAM_START_WEEK_KEY;
-if(selectedWeekKey > REAL_CURRENT_WEEK) selectedWeekKey = REAL_CURRENT_WEEK;
+if(selectedWeekKey > currentWorkingWeek) selectedWeekKey = currentWorkingWeek;
 let state=history[selectedWeekKey]||{};
 function persist(){history[selectedWeekKey]=state;saveHistory(history);}
 saveHistory(history);
@@ -351,7 +359,7 @@ function clampLogDay(dayId){
 }
 function getActiveDayForWeek(weekKey){
   if(activeDayByWeek[weekKey]===undefined){
-    activeDayByWeek[weekKey]=weekKey===REAL_CURRENT_WEEK?Math.min(getToday(),5):0;
+    activeDayByWeek[weekKey]=weekKey===currentWorkingWeek?Math.min(getToday(),5):0;
     saveActiveDayMap(activeDayByWeek);
   }
   return clampLogDay(activeDayByWeek[weekKey]);
@@ -361,7 +369,7 @@ function setActiveDayForWeek(weekKey,dayId){
   saveActiveDayMap(activeDayByWeek);
 }
 function setSelectedWeek(weekKey){
-  selectedWeekKey = weekKey > REAL_CURRENT_WEEK ? REAL_CURRENT_WEEK : weekKey;
+  selectedWeekKey = weekKey > currentWorkingWeek ? currentWorkingWeek : weekKey;
   state = history[selectedWeekKey]||{};
   localStorage.setItem(WEEK_PREF_KEY, selectedWeekKey);
   activeDay = getActiveDayForWeek(selectedWeekKey);
@@ -549,8 +557,8 @@ function renderLog(){
   const versionBadge = document.getElementById('versionBadge');
   if(versionBadge) versionBadge.textContent='BUILD ' + APP_VERSION;
   const weekNum = getWeekNumber(mondayDate(selectedWeekKey));
-  const isCurrentWeek = selectedWeekKey === REAL_CURRENT_WEEK;
-  document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(selectedWeekKey) + ')' + (isCurrentWeek ? '' : ' - CUSTOM');
+  const isCurrentWeek = selectedWeekKey === currentWorkingWeek;
+  document.getElementById('weekLabel').textContent = 'WEEK ' + weekNum + ' (' + fmtWeek(selectedWeekKey) + ')' + (isCurrentWeek ? '' : ' - ARCHIVED');
   populateWeekSelect(weekNum);
   const weekResolved = document.getElementById('logWeekResolved');
   if(weekResolved){
@@ -626,6 +634,8 @@ function completeWeekAndAdvance(){
   }
   const nextKey=nextWeekKey(selectedWeekKey);
   if(!history[nextKey]) history[nextKey]={};
+  currentWorkingWeek=nextKey;
+  localStorage.setItem(WORKING_WEEK_KEY,nextKey);
   setSelectedWeek(nextKey);
   setActiveDayForWeek(nextKey,0);
   renderLog();
