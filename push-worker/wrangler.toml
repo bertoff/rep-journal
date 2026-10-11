@@ -1,0 +1,21 @@
+name = "rep-journal-push"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+# Single-file worker with no npm imports, so skip esbuild (Windows blocks it
+# from writing into Documents).
+no_bundle = true
+
+[vars]
+# Public half of the VAPID key pair. The private half is a secret:
+#   npx wrangler secret put VAPID_PRIVATE_KEY
+VAPID_PUBLIC_KEY = "BJfgIbFPvSUZpSwmEjjBpWJKz4pDbsd_hfO6pJToshESKJ5E920naNJvpA6j_FcRyt_mOBKUkvdwDgp0FQB3F5c"
+VAPID_SUBJECT = "https://bertoff.github.io/rep-journal/"
+ALLOWED_ORIGINS = "https://bertoff.github.io,http://localhost:8767"
+
+[[durable_objects.bindings]]
+name = "TIMERS"
+class_name = "RestTimer"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RestTimer"]
