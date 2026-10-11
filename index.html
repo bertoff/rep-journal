@@ -79,12 +79,12 @@
   .week-resolved span{color:var(--text);}
 
   /* ── DAY TABS ── */
-  .day-tabs{display:flex;overflow-x:auto;gap:6px;padding:0 16px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
-  .day-tabs::-webkit-scrollbar{display:none;}
-  .day-tab{flex-shrink:0;text-align:center;padding:6px 10px;border:1px solid var(--dim);background:rgba(10,24,52,.4);color:var(--muted);
-    font-weight:700;font-size:.75rem;letter-spacing:2px;cursor:pointer;transition:all .12s;}
-  .day-tab small{display:block;font-size:.56rem;letter-spacing:1px;color:var(--muted);margin-top:1px;}
-  .day-tab .dot{display:inline-block;width:6px;height:6px;transform:rotate(45deg);margin-right:6px;vertical-align:1px;background:var(--acc);box-shadow:0 0 6px var(--acc);}
+  /* All six tabs share the row equally, so no sideways scrolling */
+  .day-tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;padding:0 16px 4px;}
+  .day-tab{min-width:0;text-align:center;padding:6px 0 5px;border:1px solid var(--dim);background:rgba(10,24,52,.4);color:var(--muted);
+    font-weight:700;font-size:.72rem;letter-spacing:1px;cursor:pointer;transition:all .12s;}
+  .day-tab small{display:block;font-size:.52rem;letter-spacing:.5px;color:var(--muted);margin-top:1px;}
+  .day-tab .dot{display:block;width:5px;height:5px;margin:0 auto 5px;transform:rotate(45deg);background:var(--acc);box-shadow:0 0 6px var(--acc);}
   .day-tab.active{border-color:var(--acc);color:var(--text);background:rgba(var(--acc-rgb),.08);box-shadow:0 0 10px rgba(var(--acc-rgb),.35);}
   .day-tab.active small{color:var(--text);}
 
