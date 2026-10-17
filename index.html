@@ -17,12 +17,12 @@
     --bg:#04060c; --panel:rgba(10,24,52,.78); --panel2:rgba(16,36,74,.7); --well:rgba(4,10,24,.8);
     --line:rgba(77,195,255,.45); --glow:#4dc3ff; --glow2:#2f7dff;
     --text:#e4f2ff; --muted:#6f8db5; --dim:#2c4366;
-    --pull:#ff4d6d; --dip:#b37bff; --danger:#ff8a8a;
+    --pull:#ff4d6d; --push:#b37bff; --danger:#ff8a8a;
     --safe-top:env(safe-area-inset-top,0px); --safe-bottom:env(safe-area-inset-bottom,0px);
   }
-  /* Accent colour follows the exercise: pull ups = red, dips = purple */
+  /* Accent colour follows the exercise: pull ups = red, push ups = purple */
   .pull{--acc:var(--pull);--acc-rgb:255,77,109;}
-  .dip {--acc:var(--dip); --acc-rgb:179,123,255;}
+  .push{--acc:var(--push);--acc-rgb:179,123,255;}
 
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:radial-gradient(120% 50% at 50% 0%,rgba(47,125,255,.16),transparent 60%) fixed,radial-gradient(80% 40% at 50% 100%,rgba(179,123,255,.07),transparent 70%) fixed,var(--bg);
@@ -101,6 +101,11 @@
   .q-bar{height:5px;background:var(--dim);margin-top:8px;}
   .q-bar i{display:block;height:100%;background:var(--acc);box-shadow:0 0 8px var(--acc);transition:width .3s;}
   .q-note{font-size:.68rem;color:var(--muted);margin-top:10px;letter-spacing:2px;}
+  .vest-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;font-size:.72rem;letter-spacing:2px;color:var(--muted);}
+  .vest-ctrl{display:flex;}
+  .vest-ctrl button{width:32px;height:32px;border:1px solid var(--line);background:var(--panel2);color:var(--glow);font-size:1rem;cursor:pointer;touch-action:manipulation;}
+  .vest-input{width:58px;text-align:center;font-family:'Oxanium';font-weight:800;font-size:1rem;background:var(--well);border:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;color:var(--acc);outline:none;appearance:textfield;-moz-appearance:textfield;}
+  .vest-input::-webkit-outer-spin-button,.vest-input::-webkit-inner-spin-button{appearance:none;margin:0;}
 
   .section-label{font-family:'Orbitron';font-size:.62rem;letter-spacing:4px;color:var(--muted);margin:20px 0 9px;}
 
@@ -267,11 +272,11 @@
 // ── CONFIG ───────────────────────────────────────────────────────────────────
 const DAYS = [
   {id:0,name:'MON',label:'MONDAY',   type:'pull',workout:'max',   sets:3 },
-  {id:1,name:'TUE',label:'TUESDAY',  type:'dip', workout:'max',   sets:3 },
+  {id:1,name:'TUE',label:'TUESDAY',  type:'push', workout:'max',   sets:3 },
   {id:2,name:'WED',label:'WEDNESDAY',type:'pull',workout:'volume',sets:10},
-  {id:3,name:'THU',label:'THURSDAY', type:'dip', workout:'volume',sets:10},
+  {id:3,name:'THU',label:'THURSDAY', type:'push', workout:'volume',sets:10},
   {id:4,name:'FRI',label:'FRIDAY',   type:'pull',workout:'ladder',sets:5 },
-  {id:5,name:'SAT',label:'SATURDAY', type:'dip', workout:'ladder',sets:5 },
+  {id:5,name:'SAT',label:'SATURDAY', type:'push', workout:'ladder',sets:5 },
 ];
 const AUXILIARY_EXERCISES={
   pull:[
@@ -279,22 +284,22 @@ const AUXILIARY_EXERCISES={
     {id:'hollow_body_holds',name:'Hollow Body Holds',unit:'seconds',sets:2},
     {id:'bodyweight_squats',name:'Bodyweight Squats',unit:'reps',sets:2}
   ],
-  dip:[
+  push:[
     {id:'tricep_extensions',name:'Tricep Extensions',unit:'reps',sets:2},
     {id:'hollow_body_holds',name:'Hollow Body Holds',unit:'seconds',sets:2},
     {id:'bodyweight_squats',name:'Bodyweight Squats',unit:'reps',sets:2}
   ]
 };
-const APP_VERSION='2026.10.11.1';
+const APP_VERSION='2026.10.18.1';
 const WORKOUT_LABELS={max:'MAX DAY · 3 × MAX REPS',volume:'SUB MAX VOLUME · 10 × VOLUME SETS',ladder:'LADDER VOLUME · 5 × LADDER SETS'};
 const WORKOUT_SHORT={max:'MAX',volume:'VOLUME',ladder:'LADDER'};
 const WORKOUT_NAMES={max:'Max Days',volume:'Sub Max Volume',ladder:'Ladder Volume'};
-const TYPE_NAMES={pull:'PULL UPS',dip:'DIPS'};
-const TYPE_COLORS={pull:{line:'#ff4d6d',fill:'rgba(255,77,109,.16)'},dip:{line:'#b37bff',fill:'rgba(179,123,255,.16)'}};
+const TYPE_NAMES={pull:'PULL UPS',push:'PUSH UPS'};
+const TYPE_COLORS={pull:{line:'#ff4d6d',fill:'rgba(255,77,109,.16)'},push:{line:'#b37bff',fill:'rgba(179,123,255,.16)'}};
 const PROGRAM_START_DATE = new Date(2026, 2, 16); // 16 March 2026
 const PROGRAM_START_WEEK_KEY = mondayStr(PROGRAM_START_DATE);
 
-// Levels: 1 rep (pull ups + dips) = 1 XP
+// Levels: 1 rep (pull ups + push ups) = 1 XP
 const XP_PER_LEVEL=250;
 const RANKS=[
   {minLevel:50,rank:'S',title:'SHADOW MONARCH'},
@@ -612,13 +617,13 @@ function dayTotal(weekData,dayId){
   let t=0;for(let s=0;s<day.sets;s++)t+=ds[`set_${s}`]||0;return t;
 }
 function weekTotals(weekData){
-  let pull=0,dip=0;
-  DAYS.forEach(d=>{const t=dayTotal(weekData,d.id);if(d.type==='pull')pull+=t;else dip+=t;});
-  return{pull,dip};
+  let pull=0,push=0;
+  DAYS.forEach(d=>{const t=dayTotal(weekData,d.id);if(d.type==='pull')pull+=t;else push+=t;});
+  return{pull,push};
 }
 function weekHasData(weekData){
   const wt=weekTotals(weekData||{});
-  return (wt.pull+wt.dip)>0;
+  return (wt.pull+wt.push)>0;
 }
 function getLoggedWeekKeys(){
   return Object.keys(history).filter(wk=>weekHasData(history[wk]||{})).sort();
@@ -643,6 +648,41 @@ function nextWeekKey(weekKey){
   d.setDate(d.getDate()+7);
   return mondayStr(d);
 }
+// Push ups are done in a weighted vest; each push day remembers its load.
+// A new day starts from the most recent load logged.
+const VEST_STEP_KG=2.5, VEST_MAX_KG=40;
+function hasVest(day){return day.type==='push';}
+function lastVestKg(){
+  const weeks=Object.keys(history).filter(wk=>wk<=selectedWeekKey).sort().reverse();
+  for(const wk of weeks){
+    const wd=history[wk]||{};
+    for(const d of [...DAYS].reverse()){
+      if(!hasVest(d) || (wk===selectedWeekKey && d.id>activeDay)) continue;
+      const v=wd[d.id]?.vest_kg;
+      if(v!==undefined) return v;
+    }
+  }
+  return 0;
+}
+function stampVest(dayId){
+  if(!hasVest(DAYS[dayId])) return;
+  const ds=dayState(state,dayId);
+  if(ds.vest_kg===undefined) ds.vest_kg=lastVestKg();
+}
+function saveVest(dayId,kg){
+  if(!Number.isFinite(kg)) kg=0;
+  dayState(state,dayId).vest_kg=Math.min(VEST_MAX_KG,Math.max(0,Math.round(kg*4)/4));
+  persist();
+  renderLog();
+}
+function setVest(dayId,input){saveVest(dayId,parseFloat(String(input.value).replace(',','.')));}
+function stepVest(dayId,dir){stampVest(dayId);saveVest(dayId,state[dayId].vest_kg+dir*VEST_STEP_KG);}
+function renderVest(day,ds){
+  if(!hasVest(day)) return '';
+  const kg=ds.vest_kg!==undefined?ds.vest_kg:lastVestKg();
+  return `<div class="vest-row"><span>VEST LOAD</span><div class="vest-ctrl"><button onclick="stepVest(${day.id},-1)">−</button><input class="vest-input" type="number" inputmode="decimal" min="0" max="${VEST_MAX_KG}" step="0.5" value="${kg}" onchange="setVest(${day.id},this)"><button onclick="stepVest(${day.id},1)">+</button></div><span>KG</span></div>`;
+}
+
 function setsCleared(day,ds){
   let n=0;
   for(let s=0;s<day.sets;s++){
@@ -653,16 +693,16 @@ function setsCleared(day,ds){
 
 // ── LEVEL / RANK ─────────────────────────────────────────────────────────────
 function lifetimeTotals(){
-  let pull=0,dip=0;
-  Object.values(history).forEach(w=>{const t=weekTotals(w||{});pull+=t.pull;dip+=t.dip;});
-  return {pull,dip};
+  let pull=0,push=0;
+  Object.values(history).forEach(w=>{const t=weekTotals(w||{});pull+=t.pull;push+=t.push;});
+  return {pull,push};
 }
 function playerStatus(){
   const lt=lifetimeTotals();
-  const xp=lt.pull+lt.dip;
+  const xp=lt.pull+lt.push;
   const level=Math.floor(xp/XP_PER_LEVEL)+1;
   const r=RANKS.find(r=>level>=r.minLevel);
-  return {xp,level,into:xp%XP_PER_LEVEL,rank:r.rank,title:r.title,pull:lt.pull,dip:lt.dip};
+  return {xp,level,into:xp%XP_PER_LEVEL,rank:r.rank,title:r.title,pull:lt.pull,push:lt.push};
 }
 function renderHeader(){
   const p=playerStatus();
@@ -681,7 +721,7 @@ function renderTabs(){
   c.innerHTML='';
   DAYS.forEach(day=>{
     const b=document.createElement('button');
-    const dayLabel = day.type==='pull' ? 'PULL' : 'DIPS';
+    const dayLabel = day.type==='pull' ? 'PULL' : 'PUSH';
     b.className=`day-tab ${day.type}${day.id===activeDay?' active':''}`;
     b.innerHTML=`<span class="dot"></span>${dayLabel}<small>${WORKOUT_SHORT[day.workout]}</small>`;
     b.title=`${day.label} - ${WORKOUT_LABELS[day.workout]}`;
@@ -737,6 +777,7 @@ function renderAuxiliaryExercises(day,ds){
 }
 
 function setAuxiliaryValue(dayId,exerciseId,setIdx,input){
+  stampVest(dayId);
   const val=Math.max(0,parseInt(input.value,10)||0);
   const ds=dayState(state,dayId);
   ds[`aux_${exerciseId}_set_${setIdx}`]=val;
@@ -759,6 +800,7 @@ function renderLog(){
         <div class="q-label">${day.label} · TRAINING TO BECOME STRONGER</div>
         <div class="workout-title">${TYPE_NAMES[cls]}</div>
         <div class="workout-subtitle">${WORKOUT_LABELS[day.workout]}</div>
+        ${renderVest(day,ds)}
         <div class="q-goal"><span>REPS CLEARED</span><b>${tot}</b></div>
         <div class="q-bar"><i style="width:${cleared/day.sets*100}%"></i></div>
         <div class="q-note">SETS ${cleared} / ${day.sets} CLEARED</div>
@@ -771,7 +813,7 @@ function renderLog(){
       <div class="win-head"><span class="bang">!</span>WEEKLY PROGRESS</div>
       <div class="week-grid">
         <div class="week-stat pull"><div class="label">PULL UPS</div><div class="val">${wt.pull}</div></div>
-        <div class="week-stat dip"><div class="label">DIPS</div><div class="val">${wt.dip}</div></div>
+        <div class="week-stat push"><div class="label">PUSH UPS</div><div class="val">${wt.push}</div></div>
       </div>
       <div class="week-actions ${cls}">
         <button class="sys-btn ${weekReady?'ready':'locked'}" ontouchend="completeWeekAndAdvance()" onclick="completeWeekAndAdvance()" ${weekReady?'':'disabled'}>${weekReady?'QUEST COMPLETE · START NEXT WEEK':'🔒 CLEAR SAT LADDER (ALL 5 SETS) TO ADVANCE'}</button>
@@ -786,7 +828,7 @@ function renderLog(){
   }
 }
 
-function chRep(dayId,si,delta){const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);if(ds[k]===0)ds[`${k}_done`]=false;persist();renderLog();}
+function chRep(dayId,si,delta){stampVest(dayId);const ds=dayState(state,dayId),k=`set_${si}`;const current=ds[k]!==undefined?ds[k]:0;ds[k]=Math.max(0,current+delta);if(ds[k]===0)ds[`${k}_done`]=false;persist();renderLog();}
 function parseRepValue(value){
   const digits=String(value??'').replace(/\D/g,'');
   if(!digits) return 0;
@@ -799,6 +841,7 @@ function normalizeRepInput(input){
   return digits;
 }
 function setRepValue(dayId,si,input,rerender){
+  stampVest(dayId);
   const ds=dayState(state,dayId),k=`set_${si}`;
   ds[k]=parseRepValue(normalizeRepInput(input));
   if(ds[k]===0)ds[`${k}_done`]=false;
@@ -823,6 +866,7 @@ function promptRep(dayId,si){
   input.select();
 }
 function completeSet(dayId,si){
+  stampVest(dayId);
   const day=DAYS[dayId];
   const ds=dayState(state,dayId);
   const k=`set_${si}`;
@@ -833,7 +877,7 @@ function completeSet(dayId,si){
   startTimer(day.workout, dayId, si);
   renderLog();
 }
-function addRung(dayId,si,type){const ds=dayState(state,dayId),k=`set_${si}`;if(!ds[k])ds[k]=[];const rungs=ds[k];rungs.push({reps:rungs.length+1,done:false,failed:false});persist();renderLog();startTimer('ladder',dayId,si,30);}function toggleRung(dayId,si,ri){const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];if(rungs[ri]&&!rungs[ri].failed){rungs[ri].done=!rungs[ri].done;if(rungs[ri].done)startTimer('ladder',dayId,si,30);}persist();renderLog();}
+function addRung(dayId,si,type){stampVest(dayId);const ds=dayState(state,dayId),k=`set_${si}`;if(!ds[k])ds[k]=[];const rungs=ds[k];rungs.push({reps:rungs.length+1,done:false,failed:false});persist();renderLog();startTimer('ladder',dayId,si,30);}function toggleRung(dayId,si,ri){stampVest(dayId);const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];if(rungs[ri]&&!rungs[ri].failed){rungs[ri].done=!rungs[ri].done;if(rungs[ri].done)startTimer('ladder',dayId,si,30);}persist();renderLog();}
 function failRung(dayId,si,ri){
   const ds=dayState(state,dayId),rungs=ds[`set_${si}`]||[];
   if(rungs[ri]) rungs.splice(ri,1);
@@ -874,7 +918,7 @@ function renderProgress(){
   const p=playerStatus();
   const weeksCleared=weeks.filter(wk=>wk<currentWorkingWeek).length;
   const wkLabels=[],wkTotals=[];
-  weeks.forEach(wk=>{wkLabels.push(fmtWeekShort(wk));const wt=weekTotals(history[wk]||{});wkTotals.push(type==='pull'?wt.pull:wt.dip);});
+  weeks.forEach(wk=>{wkLabels.push(fmtWeekShort(wk));const wt=weekTotals(history[wk]||{});wkTotals.push(type==='pull'?wt.pull:wt.push);});
   const typeDays=DAYS.filter(d=>d.type===type);
   const DASH={max:[],volume:[6,4],ladder:[2,3]};
   const POINT={max:'circle',volume:'rect',ladder:'triangle'};
@@ -897,11 +941,13 @@ function renderProgress(){
   if(weeks.length===0){histHtml='<div class="no-data">NO DATA YET · START LOGGING!</div>';}
   else{
     [...weeks].reverse().forEach(wk=>{
-      const wd=history[wk]||{},wt=weekTotals(wd),tot=type==='pull'?wt.pull:wt.dip,isCur=wk===selectedWeekKey;
-      let typeSets = {};
+      const wd=history[wk]||{},wt=weekTotals(wd),tot=type==='pull'?wt.pull:wt.push,isCur=wk===selectedWeekKey;
+      let typeSets = {}, vestByLabel = {};
       DAYS.filter(d=>d.type===type).forEach(day=>{
         const dayTypeLabel = WORKOUT_NAMES[day.workout];
         if(!typeSets[dayTypeLabel]) typeSets[dayTypeLabel] = [];
+        const kg = wd[day.id]?.vest_kg;
+        if(hasVest(day) && kg) vestByLabel[dayTypeLabel] = kg;
         for(let s=0; s<day.sets; s++){
           let setReps = 0;
           if(day.workout === 'ladder'){
@@ -916,7 +962,7 @@ function renderProgress(){
       let drows = '';
       Object.keys(typeSets).forEach(typeLabel => {
         if(typeSets[typeLabel].length > 0){
-          drows += `<div class="hw-day-row"><span class="hw-day-name">${typeLabel}</span><span class="hw-day-val">${typeSets[typeLabel].join(', ')}</span></div>`;
+          drows += `<div class="hw-day-row"><span class="hw-day-name">${typeLabel}${vestByLabel[typeLabel]?` · ${vestByLabel[typeLabel]} KG`:''}</span><span class="hw-day-val">${typeSets[typeLabel].join(', ')}</span></div>`;
         }
       });
       histHtml+=`<div class="win history-week ${type}"><div class="hw-header" ontouchend="toggleHistWeek(this)" onclick="toggleHistWeek(this)"><div><div class="hw-label">${fmtWeek(wk)}</div>${isCur?'<div class="hw-current">ACTIVE WEEK</div>':''}</div><div class="hw-total">${tot}<small>REPS</small></div></div><div class="hw-body">${drows}</div></div>`;
@@ -939,13 +985,13 @@ function renderProgress(){
         <div class="srow"><span>WEEKS CLEARED</span><b>${weeksCleared}</b></div>
         <div class="attrs">
           <div class="attr pull"><div class="k">PULL UPS</div><div class="v">${p.pull.toLocaleString()}</div></div>
-          <div class="attr dip"><div class="k">DIPS</div><div class="v">${p.dip.toLocaleString()}</div></div>
+          <div class="attr push"><div class="k">PUSH UPS</div><div class="v">${p.push.toLocaleString()}</div></div>
         </div>
       </div>
     </div>
     <div class="type-toggle">
       <button class="type-btn pull ${type==='pull'?'active':''}" ontouchend="setProgressType('pull')" onclick="setProgressType('pull')">PULL UPS</button>
-      <button class="type-btn dip ${type==='dip'?'active':''}" ontouchend="setProgressType('dip')" onclick="setProgressType('dip')">DIPS</button>
+      <button class="type-btn push ${type==='push'?'active':''}" ontouchend="setProgressType('push')" onclick="setProgressType('push')">PUSH UPS</button>
     </div>
     <div class="win chart-card"><div class="win-head">WEEKLY TOTAL REPS</div><canvas id="weeklyChart" height="155"></canvas></div>
     <div class="win chart-card"><div class="win-head">REPS PER SESSION</div><canvas id="dayChart" height="185"></canvas></div>
